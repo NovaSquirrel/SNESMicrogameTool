@@ -17,7 +17,7 @@ version = 0.06
 # (use a backslash to continue on the next line)
 objlist = \
   snesheader init main bg player \
-  ppuclear blarggapu spcimage musicseq
+  ppuclear blarggapu spcimage musicseq memory
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \

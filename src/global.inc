@@ -1,6 +1,7 @@
+.include "ns_snes.s"
+
 ; main.s
 .global main, nmi_handler, irq_handler
-.globalzp oam_used
 
 ; ppuclear.s
 .global ppu_copy_oam, ppu_pack_oamhi, ppu_clear_oam

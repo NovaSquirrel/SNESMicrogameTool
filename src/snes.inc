@@ -31,13 +31,6 @@ PPUBRIGHT = $2100
 ; 76543210
 ; |   ++++- brightness (F: max)
 ; +-------- 1: disable rendering
-;
-; Rendering on when bit 7 is false is the opposite sense from bit 7
-; of LCDC on Game Boy, but the same sense as bit 7 of DISPCNT on GBA.
-; Think of it as two's complement: rendering is on when brightness
-; is positive or off when brightness is negative.
-; "Is the PPU on?"
-; "Negative."
 FORCEBLANK = $80
 
 PPURES = $2133
@@ -73,7 +66,7 @@ PPUSTATUS2 = $213F
 
 OBSEL = $2101
 ; 76543210
-; ||||| ++- Sprite main pattern table (0=$0000, 1=$2000, 2=$4000, 3=$6000)
+; ||||| ++- Sprite main pattern table (0=$0000, 1=$4000, 2=$8000, 3=$C000)
 ; |||++---- Alt pattern table offset (0=$1000, 1=$2000, 2=$3000, 3=$4000)
 ; +++------ 0: 8/16; 1: 8/32; 2: 8/64; 3: 16/64; 4: 32/64; 5: 64/64
 ;           (all sprites are square and 2D-mapped)
@@ -111,6 +104,7 @@ BGMODE = $2105
 ; +-------- Plane 3 tile size (0: 8x8, 1: 16x16)
 ;           Modes 5 and 6 use 16x8 instead of 8x8
 ;           Mode 7 always uses 8x8
+BG3_PRIORITY = 8
 
 MOSAIC = $2106
 ; 76543210
@@ -173,7 +167,11 @@ PPUCTRL = $2115
 ; Corresponds to bit 2 of $2000 on NES
 VRAM_DOWN   = $01
 VRAM_M7DOWN = $02
+INC_DATALO  = $00
 INC_DATAHI  = $80
+VRAM_BITMAP2 = %0100
+VRAM_BITMAP4 = %1000
+VRAM_BITMAP8 = %1100
 
 PPUADDR = $2116  ; Word address, not double-write anymore
 PPUDATA = $2118
@@ -187,6 +185,7 @@ CGADDR = $2121
 CGDATA = $2122  ; 5-bit BGR, write twice, low byte first
 CGDATARD = $213B  ; 5-bit BGR, read twice, low byte first
 .define RGB(r,g,b) ((r)|((g)<<5)|((b)<<10))
+.define RGB8(r,g,b) ((r/8)|((g/8)<<5)|((b/8)<<10))
 
 ; S-PPU window ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -385,11 +384,10 @@ DMAADDRBANK = $4304
 DMALEN = $4305  ; number of bytes, not number of transfers; 0 means 65536
 DMALENHI = $4306
 
-; A future demo that includes HDMA effects would include port definitions.
-;HDMAINDBANK = $4307
-;HDMATABLELO = $4308
-;HDMATABLEHI = $4309
-;HDMALINE = $430A
+HDMAINDBANK = $4307
+HDMATABLELO = $4308
+HDMATABLEHI = $4309
+HDMALINE = $430A
 
 ; composite values for use with 16-bit writes to DMAMODE
 DMAMODE_PPULOFILL = (<PPUDATA << 8)       | DMA_LINEAR | DMA_CONST
@@ -588,3 +586,20 @@ second_ = second
 .endmacro
 
 .endif
+
+; OAM ATTRIBUTES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                 ;YXPPpppttttttttt
+OAM_COLOR_0    = %0000000000000000
+OAM_COLOR_1    = %0000001000000000
+OAM_COLOR_2    = %0000010000000000
+OAM_COLOR_3    = %0000011000000000
+OAM_COLOR_4    = %0000100000000000
+OAM_COLOR_5    = %0000101000000000
+OAM_COLOR_6    = %0000110000000000
+OAM_COLOR_7    = %0000111000000000
+OAM_PRIORITY_0 = %0000000000000000
+OAM_PRIORITY_1 = %0001000000000000
+OAM_PRIORITY_2 = %0010000000000000
+OAM_PRIORITY_3 = %0011000000000000
+OAM_XFLIP      = %0100000000000000
+OAM_YFLIP      = %1000000000000000

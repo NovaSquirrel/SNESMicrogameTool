@@ -1,5 +1,6 @@
 .include "snes.inc"
 .include "global.inc"
+.include "memory.inc"
 .smart
 
 .segment "ZEROPAGE"
@@ -231,7 +232,7 @@ doneWallCollision:
 ; character than it was on the NES where even modestly sized
 ; characters required laying out a grid of sprites.
 .proc draw_player_sprite
-  ldx oam_used
+  ldx OamPtr
   
   ; OAM+0,x: x coordinate, top half
   ; OAM+1,x: y coordinate, top half
@@ -295,7 +296,7 @@ doneWallCollision:
   txa
   clc
   adc #8
-  sta oam_used
+  sta OamPtr
   rtl
 .endproc
 

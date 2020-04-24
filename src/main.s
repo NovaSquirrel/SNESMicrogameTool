@@ -1,27 +1,12 @@
 .include "snes.inc"
 .include "global.inc"
+.include "memory.inc"
 .smart
 .export main, nmi_handler
 
 USE_PSEUDOHIRES = 0
 USE_INTERLACE = 0
 USE_AUDIO = 1
-
-.segment "ZEROPAGE"
-nmis: .res 1
-oam_used: .res 2
-
-.segment "BSS"
-
-OAM:   .res 512
-OAMHI: .res 512
-; OAMHI contains bit 8 of X (the horizontal position) and the size
-; bit for each sprite.  It's a bit wasteful of memory, as the
-; 512-byte OAMHI needs to be packed by software into 32 bytes before
-; being sent to the PPU, but it makes sprite drawing code much
-; simpler.  The OBC1 coprocessor used in the game Metal Combat:
-; Falcon's Revenge performs the same packing function in hardware,
-; possibly as a copy protection method.
 
 .segment "CODE"
 ;;
@@ -39,8 +24,9 @@ OAMHI: .res 512
   phk
   plb
 
+  seta16
+  inc a:retraces       ; Increase NMI count to notify main thread
   seta8
-  inc a:nmis       ; Increase NMI count to notify main thread
   bit a:NMISTATUS  ; Acknowledge NMI
 
   ; And restore the previous data bank value.
@@ -149,13 +135,13 @@ forever:
 
   ; Draw the player to a display list in main memory
   setaxy16
-  stz oam_used
+  stz OamPtr
   jsl draw_player_sprite
 
   ; Mark remaining sprites as offscreen, then convert sprite size
   ; data from the convenient-to-manipulate format described by
   ; psycopathicteen to the packed format that the PPU actually uses.
-  ldx oam_used
+  ldx OamPtr
   jsl ppu_clear_oam
   jsl ppu_pack_oamhi
 
