@@ -35,7 +35,7 @@ imgdir := tilesets
 # full speed, but the Atom-based Pentium N3710 can.
 ifndef SNESEMU
 #SNESEMU := xterm -e zsnes -d
-SNESEMU := bsnes
+SNESEMU := ./mesen-s
 endif
 
 # game-music-emu by blargg et al.
