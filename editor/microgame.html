@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<!-- 
+https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#z9ggrk
+
+https://developers.google.com/blockly/guides/get-started/web 
+
+var xml = Blockly.Xml.workspaceToDom(workspace);
+var xml_text = Blockly.Xml.domToText(xml);
+var xml_text = Blockly.Xml.domToPrettyText(xml); <--- can use this
+
+var xml = Blockly.Xml.textToDom(xml_text);
+Blockly.Xml.domToWorkspace(xml, workspace);
+
+-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>No Programming Required*</title>
+  <script src="blockly_compressed.js"></script>
+  <script src="blocks_compressed.js"></script>
+  <script src="en.js"></script>
+  <script src="block_definitions.js"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      background-color: #fff;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+    h1 {
+      font-weight: normal;
+      font-size: 140%;
+    }
+    table {
+      height: 100%;
+      width: 100%;
+    }
+    #blocklyArea {
+      height: 99%;
+    }
+  </style>
+</head>
+<body>
+  <table>
+    <tr>
+      <td>
+        <p>
+
+        <table>
+        <tr>
+          <td>Select a File to Load:</td>
+          <td><input type="file" id="fileToLoad"></td>
+          <td><button onclick="uploadXML()">Load Selected File</button><td>
+          <td><button onclick="downloadXML()">Save File</button></td>
+        </tr>
+        </table>
+
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td id="blocklyArea">
+      </td>
+    </tr>
+  </table>
+
+  <div id="blocklyDiv" style="position: absolute"></div>
+
+  <xml id="toolbox" style="display: none">
+	  <category name="Control" colour="#a55b5b">
+		<block type="controls_if"></block>
+		<block type="controls_whileUntil">
+		  <field name="MODE">WHILE</field>
+		</block>
+		<block type="controls_flow_statements">
+		  <field name="FLOW">BREAK</field>
+		</block>
+		<block type="actor">
+		  <field name="NAME">default</field>
+		</block>
+		<block type="game_init_run"></block>
+		<block type="exit"></block>
+		<block type="note">
+		  <field name="NAME">default</field>
+		</block>
+		<block type="label"></block>
+		<block type="goto"></block>
+		<block type="game_info"></block>
+	  </category>
+	  <category name="Conditions" colour="#6da55b">
+		<block type="logic_negate"></block>
+		<block type="logic_compare">
+		  <field name="OP">EQ</field>
+		</block>
+		<block type="if_find_type"></block>
+		<block type="logic_operation">
+		  <field name="OP">AND</field>
+		</block>
+		<block type="difficulty">
+		  <field name="EASY">TRUE</field>
+		  <field name="MEDIUM">TRUE</field>
+		  <field name="HARD">TRUE</field>
+		</block>
+		<block type="logic_boolean">
+		  <field name="BOOL">TRUE</field>
+		</block>
+		<block type="won_lost">
+		  <field name="WHEN">HAS_BEEN</field>
+		  <field name="WINLOSE">WON</field>
+		</block>
+		<block type="keys">
+		  <field name="KEY">A</field>
+		  <field name="STATE">DOWN</field>
+		</block>
+		<block type="touching_type"></block>
+		<block type="in_region"></block>
+		<block type="at_end"></block>
+		<block type="every_x_frames"></block>
+		<block type="asm_condition">
+		  <field name="FLAGS">eq</field>
+		</block>
+		<block type="actor_overlap_block"></block>
+		<block type="actor_overlap_block_class"></block>
+		<block type="actor_center_overlap_block"></block>
+		<block type="actor_center_overlap_block_class"></block>
+		<block type="actor_on_ground"></block>
+		<block type="actor_hit_wall"></block>
+	  </category>
+	  <category name="Actions" colour="#5b6da5">
+		<block type="set_nomath"></block>
+		<block type="set_math">
+		  <field name="OPERATION">ADD</field>
+		</block>
+		<block type="animation"></block>
+		<block type="create"></block>
+		<block type="destroy"></block>
+		<block type="destroy_type"></block>
+		<block type="win_game"></block>
+		<block type="lose_game"></block>
+		<block type="find_type"></block>
+		<block type="target_other"></block>
+		<block type="play_sfx">
+		  <value name="SOUND">
+			<block type="sound_effect">
+			  <field name="SOUND"></field>
+			</block>
+		  </value>
+		</block>
+		<block type="assembly">
+		  <field name="instruction"></field>
+		</block>
+	  </category>
+	  <category name="Movement" colour="#5b6da5">
+		<block type="set_nomath">
+		  <value name="LEFT">
+			<block type="property">
+			  <field name="NAME">SPEED</field>
+			</block>
+		  </value>
+		  <value name="RIGHT">
+			<block type="math_number">
+			  <field name="NUM">1</field>
+			</block>
+		  </value>
+		</block>
+		<block type="ball_movement"></block>
+		<block type="ball_movement_stop"></block>
+		<block type="ball_movement_reflect"></block>
+		<block type="ball_movement_bounce"></block>
+		<block type="vector_movement"></block>
+		<block type="vector_movement_stop"></block>
+		<block type="vector_movement_reflect"></block>
+		<block type="eightway_movement">
+		  <field name="LEFT">TRUE</field>
+		  <field name="DOWN">TRUE</field>
+		  <field name="UP">TRUE</field>
+		  <field name="RIGHT">TRUE</field>
+		  <field name="COLLIDE">TRUE</field>
+		</block>
+		<block type="stop_moving"></block>
+		<block type="reverse"></block>
+		<block type="jump_xy"></block>
+		<block type="jump_other"></block>
+		<block type="swap_places"></block>
+		<block type="look_xy"></block>
+		<block type="look_other"></block>
+		<block type="apply_gravity"></block>
+	  </category>
+	  <category name="Map" colour="#5b6da5">
+		<block type="scroll_set"></block>
+		<block type="scroll_slide"></block>
+		<block type="scroll_follow_actor"></block>
+		<block type="block_target_map_xy"></block>
+		<block type="block_target_coordinate_xy"></block>
+		<block type="block_target_actor_xy"></block>
+		<block type="block_change_type"></block>
+		<block type="block_retarget_xy"></block>
+		<block type="block_target_x"></block>
+		<block type="block_target_y"></block>
+		<block type="block_target_type"></block>
+		<block type="block_target_class"></block>
+		<block type="block_target_flags"></block>
+		<block type="block_target_solid"></block>
+		<block type="block_type"></block>
+		<block type="block_class"></block>
+      </category>
+	  <category name="Values" colour="#a5a55b">
+		<block type="math_number">
+		  <field name="NUM">0</field>
+		</block>
+		<block type="coordinate_pixels">
+		  <field name="NUM">0</field>
+		</block>
+		<block type="property">
+		  <field name="NAME">TYPE</field>
+		</block>
+		<block type="other_property">
+		  <field name="NAME">TYPE</field>
+		</block>
+		<block type="actor_type">
+		  <field name="NAME">default</field>
+		</block>
+		<block type="actor_class">
+		  <field name="NAME">default</field>
+		</block>
+		<block type="global">
+		  <field name="NUM">1</field>
+		</block>
+		<block type="temp">
+		  <field name="NUM">1</field>
+		</block>
+	  </category>
+
+    <category name="Variables" colour="330" custom="VARIABLE"></category>
+    <category name="Subroutines" colour="330" custom="PROCEDURE"></category>
+  </xml>
+
+  <script>
+    var blocklyArea = document.getElementById('blocklyArea');
+    var blocklyDiv = document.getElementById('blocklyDiv');
+    var demoWorkspace = Blockly.inject(blocklyDiv,
+        {media: '../../media/',
+         comments: true,
+         scrollbars: true,
+         trashcan: true,
+         oneBasedIndex: false,
+         toolbox: document.getElementById('toolbox')});
+    var onresize = function(e) {
+      // Compute the absolute coordinates and dimensions of blocklyArea.
+      var element = blocklyArea;
+      var x = 0;
+      var y = 0;
+      do {
+        x += element.offsetLeft;
+        y += element.offsetTop;
+        element = element.offsetParent;
+      } while (element);
+      // Position blocklyDiv over blocklyArea.
+      blocklyDiv.style.left = x + 'px';
+      blocklyDiv.style.top = y + 'px';
+      blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
+      blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
+      Blockly.svgResize(demoWorkspace);
+    };
+    window.addEventListener('resize', onresize, false);
+    onresize();
+    Blockly.svgResize(demoWorkspace);
+
+    function downloadXML() {
+      var filename = 'microgame.xml';
+      var text = Blockly.Xml.domToPrettyText(Blockly.Xml.workspaceToDom(demoWorkspace));
+      var element = document.createElement('a');
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+      element.setAttribute('download', filename);
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
+    function uploadXML() {
+      var fileToLoad = document.getElementById("fileToLoad").files[0];
+
+      var fileReader = new FileReader();
+      fileReader.onload = function(fileLoadedEvent){
+          var textFromFileLoaded = fileLoadedEvent.target.result;
+          var xml = Blockly.Xml.textToDom(textFromFileLoaded);
+          Blockly.Xml.domToWorkspace(xml, demoWorkspace);
+      };
+      fileReader.readAsText(fileToLoad, "UTF-8");
+    }
+  </script>
+</body>
+</html>

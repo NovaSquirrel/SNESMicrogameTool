@@ -20,6 +20,7 @@
 # 3. This notice may not be removed or altered from any source distribution.
 #
 import glob, json, math
+from readtiled import *
 
 outfile = None
 gamename = None
@@ -91,6 +92,12 @@ conditions['every-128-frames'] = 'lda MicrogameFrames\nand #127'
 conditions_flags['every-128-frames'] = 'ne'
 conditions['at-end'] = 'lda MicrogameTime \ cmp #128' # todo
 conditions_flags['at_end'] = 'ne'
+
+conditions ['block-target-solid'] = ('BlockTargetSolid', 1)
+
+def condition_block_target_flags(a):
+	pass
+conditions['block-target-flags'] = condition_block_target_flags
 
 def insert_branch(flags, label, negate):
 	opposite = {
@@ -195,7 +202,12 @@ def compile_condition(condition, label, negate):
 
 actions = {}
 actions['ball-movement'] = 'jsl ActorBallMovement'
+actions['ball-movement-stop'] = 'jsl ActorBallMovement'
+actions['ball-movement-reflect'] = 'jsl ActorBallMovement'
+actions['ball-movement-bounce'] = 'jsl ActorBallMovement'
 actions['vector-movement'] = 'jsl ActorApplyVelocity'
+actions['vector-movement-stop'] = 'jsl ActorApplyVelocity'
+actions['vector-movement-reflect'] = 'jsl ActorApplyVelocity'
 actions['8way-movement'] = ('Actor8WayMovement', 1)
 actions['win-game'] = 'jsl WinGame'
 actions['lose-game'] = 'jsl LoseGame'
@@ -214,7 +226,30 @@ actions['play-sound'] = ('PlaySoundEffect', 1)
 actions['find-type'] = ('ActorFindType', 1)
 actions['look-at-actor'] = 'jsl ActorLookAtActor'
 actions['look-at-point'] = ('ActorLookAtPoint', 2)
+actions['apply-gravity'] = ('ApplyGravity', 1)
+actions['apply-gravity-collide'] = ('ActorFall', 1)
+
+actions['block-target-map-xy'] = ('BlockTargetXY', 2)
+actions['block-target-coordinate-xy'] = ('BlockTargetCoordinate', 2)
+actions['block-target-actor-xy'] = ('BlockTargetActorXY', 2)
+actions['block-change-type'] = ('BlockChangeType', 1)
 actions[''] = ''
+
+def cmd_scroll_set(a):
+	pass
+actions['scroll-set'] = cmd_scroll_set
+
+def cmd_scroll_slide(a):
+	pass
+actions['scroll-slide'] = cmd_scroll_slide
+
+def cmd_scroll_follow_actor(a):
+	pass
+actions['scroll-follow-actor'] = cmd_scroll_follow_actor
+
+def cmd_block_retarget_xy(a):
+	pass
+actions['block-retarget-xy'] = cmd_block_retarget_xy
 
 def cmd_animation(a):
 	outfile.write('lda #%s_Animation::%s\nsta ActorArt,x\n' % (gamename, a[0]))
@@ -301,7 +336,7 @@ values ['other-var5']         = 'ActorVarE,y'
 values ['other-var6']         = 'ActorVarF,y'
 
 values ['global']       = 'MicrogameGlobals'
-values ['global1']       = 'MicrogameGlobals+2*1'
+values ['global1']      = 'MicrogameGlobals+2*1'
 values ['global2']      = 'MicrogameGlobals+2*2'
 values ['global3']      = 'MicrogameGlobals+2*3'
 values ['global4']      = 'MicrogameGlobals+2*4'
@@ -318,10 +353,21 @@ values ['global14']     = 'MicrogameGlobals+2*14'
 values ['global15']     = 'MicrogameGlobals+2*15'
 values ['global16']     = 'MicrogameGlobals+2*16'
 values ['temp']         = 'MicrogameTemp'
-values ['temp1']        = 'MicrogameTemp'
-values ['temp2']        = 'MicrogameTemp+1'
-values ['temp3']        = 'MicrogameTemp+2'
-values ['temp4']        = 'MicrogameTemp+3'
+values ['temp1']        = 'MicrogameTemp+2*0'
+values ['temp2']        = 'MicrogameTemp+2*1'
+values ['temp3']        = 'MicrogameTemp+2*2'
+values ['temp4']        = 'MicrogameTemp+2*3'
+values ['temp5']        = 'MicrogameTemp+2*4'
+values ['temp6']        = 'MicrogameTemp+2*5'
+values ['temp7']        = 'MicrogameTemp+2*6'
+values ['temp8']        = 'MicrogameTemp+2*7'
+
+values ['block-target-x'] = 'BlockTargetX'
+values ['block-target-y'] = 'BlockTargetY'
+values ['block-target-x-coord'] = 'BlockTargetXCoord'
+values ['block-target-y-coord'] = 'BlockTargetYCoord'
+values ['block-target-type'] = '[LevelBlockPtr]'
+values ['block-target-class'] = 'BlockTargetClass'
 
 def compile_value(value):
 	if type(value) == int:
@@ -358,7 +404,7 @@ def compile_block(block):
 						value = args.pop()
 						outfile.write('lda %s\n' % compile_value(value))
 						if variable >= 0:
-							outfile.write('sta %d\n' % variable)
+							outfile.write('sta %d\n' % variable*2)
 						variable -= 1
 					outfile.write('jsl %s\n' % actions[name][0])
 				else:
@@ -433,17 +479,17 @@ def compile_microgame(filename, output):
 	outfile.write('.proc %s_ActorRun\n.dbyt (DoNothing-1)\n' % gamename)
 	for name, actor in game['actors'].items():
 		if 'run' in actor:
-			outfile.write('.dbyt (%s_Actor_Run_%s-1)\n' % (gamename, name))
+			outfile.write('.addr %s_Actor_Run_%s\n' % (gamename, name))
 		else:
-			outfile.write('.dbyt (DoNothing-1)\n')
+			outfile.write('.addr DoNothing\n')
 	outfile.write('.endproc\n\n')
 
-	outfile.write('.proc %s_ActorInit\n.dbyt (DoNothing-1)\n' % gamename)
+	outfile.write('.proc %s_ActorInit\n.addr DoNothing\n' % gamename)
 	for name, actor in game['actors'].items():
 		if 'init' in actor:
-			outfile.write('.dbyt (%s_Actor_Init_%s-1)\n' % (gamename, name))
+			outfile.write('.addr %s_Actor_Init_%s-1\n' % (gamename, name))
 		else:
-			outfile.write('.dbyt (DoNothing-1)\n')
+			outfile.write('.addr DoNothing\n')
 	outfile.write('.endproc\n\n')
 
 	outfile.write('.proc %s_ActorGraphic\n.byt 0\n' % gamename)

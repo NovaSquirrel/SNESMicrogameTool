@@ -22,6 +22,8 @@
 import xml.etree.ElementTree as ET # phone home
 import sys
 
+variable_names = set()
+
 def strip_namespace(tag):
 	# change "{whatever}tag" to "tag"
 	find = tag.find('}')
@@ -33,7 +35,7 @@ class Block(object):
 	def __init__(self, block):
 		# translate the XML of a block to something I can work with
 		tagname = strip_namespace(block.tag)
-		if tagname != 'block':
+		if tagname != 'block' and tagname != 'shadow':
 			print("Bad tag, got "+tagname)
 			sys.exit()
 
@@ -75,7 +77,14 @@ class Block(object):
 			return 'sound:'+block.field['SOUND']
 		elif block.type == 'actor_type':
 			return 'actor:'+block.field['NAME']
-
+		elif block.type == 'block_type':
+			return 'block:'+block.field['NAME']
+		elif block.type == 'coordinate_pixels':
+			return str(16*int(block.field['NUM']))
+		elif block.type == 'variables_get':
+			return 'variable:'+block.field['VAR']
+		else:
+			print("Unknown value type " + block.type)
 #######################################
 
 # should have just made the property block use the right name
@@ -141,9 +150,34 @@ def cnd_touching_type(block):
 	return ['touching-type', block.translate_value('NAME')]
 conditions['touching_type'] = cnd_touching_type
 
+def cnd_actor_overlap_block(block):
+	return ['actor-overlap-block', block.translate_value('NAME')]
+conditions['actor_overlap_block'] = cnd_actor_overlap_block
+
+def cnd_actor_overlap_block_class(block):
+	return ['actor-overlap-block-class', block.translate_value('NAME')]
+conditions['actor_overlap_block_class'] = cnd_actor_overlap_block_class
+
+def cnd_actor_center_overlap_block(block):
+	return ['actor-center-overlap-block', block.translate_value('NAME')]
+conditions['actor_center_overlap_block'] = cnd_actor_center_overlap_block
+
+def cnd_actor_center_overlap_block_class(block):
+	return ['actor-center-overlap-block-class', block.translate_value('NAME')]
+conditions['actor_center_overlap_block_class'] = cnd_actor_center_overlap_block_class
+
 def cnd_in_region(block):
 	return ['in-region', block.translate_value('XPOS1'), block.translate_value('YPOS1'), block.translate_value('XPOS2'), block.translate_value('YPOS2')]
 conditions['in_region'] = cnd_in_region
+
+def cnd_block_target_flags(block):
+	# TODO: actually interpret these flags?
+	return ['block-target-flags']
+conditions['block_target_flags'] = cnd_block_target_flags
+
+def cnd_block_target_solid(block):
+	return ['block-target-solid']
+conditions['block_target_solid'] = cnd_block_target_solid
 
 def cnd_asm_condition(block):
 	# todo
@@ -157,7 +191,7 @@ conditions['logic_operation'] = cnd_logic_operation
 def cnd_logic_compare(block):
 	comparisons = {}
 	comparisons['EQ'] = '=='
-	comparisons['NE'] = '!='
+	comparisons['NEQ'] = '!='
 	comparisons['LT'] = '<'
 	comparisons['LTE'] = '<='
 	comparisons['GT'] = '>'
@@ -175,6 +209,14 @@ conditions['logic_boolean'] = cnd_logic_boolean
 def cnd_logic_negate(block):
 	return ['not'] + translate_condition(block.value['BOOL'])
 conditions['logic_negate'] = cnd_logic_negate
+
+def cnd_actor_on_ground(block):
+	return ['actor-on-ground']
+conditions['actor_on_ground'] = cnd_actor_on_ground
+
+def cnd_actor_hit_wall(block):
+	return ['actor-hit-wall']
+conditions['actor_hit_wall'] = cnd_actor_hit_wall
 
 def translate_condition(block):
 	block = Block(block)
@@ -230,20 +272,36 @@ def blk_ball_movement(block):
 	return ['ball-movement']
 blocks['ball_movement'] = blk_ball_movement
 
+def blk_ball_movement_stop(block):
+	return ['ball-movement-stop']
+blocks['ball_movement_stop'] = blk_ball_movement_stop
+
+def blk_ball_movement_reflect(block):
+	return ['ball-movement-reflect']
+blocks['ball_movement_reflect'] = blk_ball_movement_reflect
+
 def blk_vector_movement(block):
 	return ['vector-movement']
 blocks['vector_movement'] = blk_vector_movement
 
+def blk_vector_movement_stop(block):
+	return ['vector-movement-stop']
+blocks['vector_movement_stop'] = blk_vector_movement_stop
+
+def blk_vector_movement_reflect(block):
+	return ['vector-movement-reflect']
+blocks['vector_movement_reflect'] = blk_vector_movement_reflect
+
 def blk_eightway_movement(block):
 	allowed = 0
 	if block.field['RIGHT'] == 'TRUE':
-		allowed |= 1
+		allowed |= 0x0100
 	if block.field['LEFT'] == 'TRUE':
-		allowed |= 2
+		allowed |= 0x0200
 	if block.field['DOWN'] == 'TRUE':
-		allowed |= 4
+		allowed |= 0x0400
 	if block.field['UP'] == 'TRUE':
-		allowed |= 8
+		allowed |= 0x0800
 	return ['8way-movement', allowed]
 blocks['eightway_movement'] = blk_eightway_movement
 
@@ -313,25 +371,88 @@ def blk_play_sfx(block):
 blocks['play_sfx'] = blk_play_sfx
 
 def blk_controls_whileUntil(block):
-	# ignore for now
-	return []
+	mode = block.field['MODE'].lower()
+	out = {}
+	out[mode] = translate_condition(block.value['BOOL'])
+	out['do'] = translate_routine(block.statement['DO'])
+	return out
 blocks['controls_whileUntil'] = blk_controls_whileUntil
+
+def blk_apply_gravity(block):
+	if block.field['COLLIDE'] == 'TRUE':
+		return ['apply-gravity-collide', block.translate_value('STRENGTH')]
+	else:
+		return ['apply-gravity', block.translate_value('STRENGTH')]
+blocks['apply_gravity'] = blk_apply_gravity
+
+def blk_scroll_follow_actor(block):
+	if block.field['SLOW'] == 'DIV1':
+		return ['scroll-follow-actor', 0]
+	if block.field['SLOW'] == 'DIV2':
+		return ['scroll-follow-actor', 1]
+	if block.field['SLOW'] == 'DIV4':
+		return ['scroll-follow-actor', 2]
+	if block.field['SLOW'] == 'DIV8':
+		return ['scroll-follow-actor', 3]
+blocks['scroll_follow_actor'] = blk_scroll_follow_actor
+
 
 def blk_note(block):
 	return []
 blocks['note'] = blk_note
+
+def blk_block_change_type(block):
+	return ['block-change-type', block.translate_value('NAME')]
+blocks['block_change_type'] = blk_block_change_type
+
+def blk_math_change(block):
+	return ['set',
+		'variable:'+block.field['VAR'],
+		'variable:'+block.field['VAR'],
+		'-',
+		block.translate_value('DELTA')]
+blocks['math_change'] = blk_math_change
+
+def blk_variables_set(block):
+	return ['set',
+		'variable:'+block.field['VAR'],
+		'variable:'+block.field['VAR'],
+		block.translate_value('DVALUE')]
+blocks['variables_set'] = blk_variables_set
+
+
+def blk_label(block):
+	return ['label', block.field['NAME']]
+blocks['label'] = blk_label
+
+def blk_goto(block):
+	return ['goto', block.field['NAME']]
+blocks['goto'] = blk_goto
 
 def blk_procedures_callnoreturn(block):
 	return ['call', block.mutation['name']]
 blocks['procedures_callnoreturn'] = blk_procedures_callnoreturn
 
 def blk_controls_if(block):
+	has_elif = 0
+	if 'elseif' in block.mutation:
+		has_elif = int(block.mutation['elseif'])
+
 	out = {}
-	# if IF1 DO1 and so on are present, there's "else if" which should just be a bunch of nested elses
+	put_else_in = out # dictionary to put the if/else in
+
+	# turn else-if into nested ifs
+	for i in range(has_elif):
+		the_elif = {}
+		the_elif['if'] = translate_condition(block.value['IF'+str(i+1)])
+		the_elif['then'] = translate_routine(block.statement['DO'+str(i+1)])
+		put_else_in['else'] = the_elif
+		put_else_in = the_elif
+
 	out['if'] = translate_condition(block.value['IF0'])
 	out['then'] = translate_routine(block.statement['DO0'])
 	if 'ELSE' in block.statement:
-		out['else'] = translate_routine(block.statement['ELSE'])
+		put_else_in['else'] = translate_routine(block.statement['ELSE'])
 	return out
 blocks['controls_if'] = blk_controls_if
 
@@ -358,9 +479,14 @@ def translate_xml(filename):
 	tree = ET.parse(filename)
 	root = tree.getroot()
 
-	out = {'game': {}, 'actors': {}, 'subroutines': {}}
+	out = {'game': {}, 'actors': {}, 'subroutines': {}, 'variables': []}
 
 	for e in root:
+		tag = strip_namespace(e.tag)
+		if tag == 'variables':
+			for variable in e:
+				out['variables'].append(variable.text)
+			continue
 		block = Block(e)
 		if block.type == 'actor':
 			actorname = block.field['NAME']

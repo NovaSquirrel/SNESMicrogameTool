@@ -50,6 +50,7 @@
   ActorSize = 14*2
   ActorStart: .res ActorLen*ActorSize
   ActorEnd:
+  INVALID_ACTOR: .res ActorSize ; dummy
 
   ActorType         = 0  ; Actor type ID
   ActorPX           = 2  ; Positions

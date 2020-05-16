@@ -18,103 +18,70 @@
 ;    misrepresented as being the original software.
 ; 3. This notice may not be removed or altered from any source distribution.
 ;
-.proc SpeedAngle2Offset ; A = speed, Y = angle -> 0,1(X) 2,3(Y)
-Angle = 4
-Speed = 5
-  sty Angle
-  sta Speed
+.include "snes.inc"
+.include "global.inc"
+.include "memory.inc"
+.smart
+.a16
+.i16
 
-  lda CosineTable,y
-  php
-  abs
-  ldy Speed
-  jsr mul8
-  sty 0
-  sta 1
-
-  plp
-  bpl :+
-  neg16 0, 1
-:
-
-  ldy Angle
-  lda SineTable,y
-  php
-  abs
-  ldy Speed
-  jsr mul8
-  sty 2
-  sta 3
-  plp
-  bpl :+
-  neg16 2, 3
-:
-  rts
-.endproc
+.segment "RuntimeLibrary"
 
 ; Adds an actor's speed to its position
+.export ActorApplyVelocity
 .proc ActorApplyVelocity
-  lda ActorPXL,x
-  add ActorVXL,x
-  sta ActorPXL,x
+  lda ActorPX,x
+  add ActorVX,x
+  sta ActorPX,x
 
-  lda ActorPXH,x
-  adc ActorVXH,x
-  sta ActorPXH,x
-
-  ; ------------
-
-  lda ActorPYL,x
-  add ActorVYL,x
-  sta ActorPYL,x
-
-  lda ActorPYH,x
-  adc ActorVYH,x
-  sta ActorPYH,x
-  rts
+  lda ActorPY,x
+  add ActorVY,x
+  sta ActorPY,x
+  rtl
 .endproc
 
+.export ActorBallMovement
 .proc ActorBallMovement
-  ldy ActorDir,x
+  lda ActorDir,x ; Multiply by 2 because SpeedAngle2Offset256 expects it to be doubled already
+  and #$00ff     ; Just to be sure
+  asl
+  tay
   lda ActorSpeed,x
-  jsr SpeedAngle2Offset ; A = speed, Y = angle -> 0,1(X) 2,3(Y)
-  lda 0
-  sta ActorVXL,x
+  jsr SpeedAngle2Offset256 ; A = speed, Y = angle -> 0,1,2(X) 2,3,4(Y)
   lda 1
-  sta ActorVXH,x
-  lda 2
-  sta ActorVYL,x
+  sta ActorVX,x
   lda 3
-  sta ActorVYH,x
+  sta ActorVY,x
   jmp ActorApplyVelocity
 .endproc
 
 ; Inputs: A (Allowed directions)
+.export Actor8WayMovement
 .proc Actor8WayMovement
   and keydown
   sta 0
 
   and #KEY_LEFT
   beq :+
-    lda ActorPXH,x
+    lda ActorPX,x
     sub ActorSpeed,x
-    sta ActorPXH,x
+    sta ActorPX,x
   :
 
   lda 0
   and #KEY_RIGHT
   beq :+
-    lda ActorPXH,x
+    lda ActorPX,x
     add ActorSpeed,x
-    sta ActorPXH,x
+    sta ActorPX,x
   :
 
   lda 0
   and #KEY_DOWN
   beq :+
-    lda ActorPYH,x
+    lda ActorPY,x
     add ActorSpeed,x
-    sta ActorPYH,x
+    sta ActorPY,x
   :
 
   lda 0
@@ -124,166 +91,172 @@ Speed = 5
     sub ActorSpeed,x
     sta ActorPYH,x
   :
-  rts
+  rtl
 .endproc
 
 ; Inputs: A (Actor type to find)
 ; Outputs: Carry (success), OtherActor (found index)
+.export ActorFindType
 .proc ActorFindType
-  ldy #NUM_ACTORS-1
-: cmp ActorType,y
+  sta 0
+
+  ldy #ActorStart
+: lda 0
+  cmp ActorType,y
   beq Found
-  dey
-  bpl :-
+
+  tya
+  add #ActorSize
+  tay
+  cmp #ActorEnd
+  bne :-
 Fail:
   ldy #INVALID_ACTOR
   sty OtherActor
   clc
-  rts
+  rtl
 Found:
   sty OtherActor
   sec
-  rts
+  rtl
 .endproc
 
 ; Finds a free actor slot
 ; Outputs: OtherActor (index), Carry (success)
+.export ActorFindFree
 .proc ActorFindFree
-  ldy #NUM_ACTORS-1
+  ldy #ActorStart
 : lda ActorType,y
   beq ActorFindType::Found
-  dey
-  bpl :-
-  bmi ActorFindType::Fail ; unconditional
+  tya
+  add #ActorSize
+  tay
+  cmp #ActorEnd
+  bne :-
+  bra ActorFindType::Fail
 .endproc
 
-; Inputs: 0(X), 1(Y), A(Type)
+; Inputs: 0(X), 2(Y), A(Type)
 ; Outputs: OtherActor (index)
 .proc ActorCreateAtXY
-  sta 2
-  jsr ActorFindFree
+  sta Type
+  jsl ActorFindFree
   bcc Fail
-  jsr ActorClearY
+  jsl ActorClearY
   lda 0
   sta ActorPXH,y
-  lda 1
-  sta ActorPYH,y
   lda 2
+  sta ActorPYH,y
+  lda 4
   sta ActorType,y
 
-  txa ; Save this actor's index
-  pha
+  phx ; Save this actor's index
     lda OtherActor
     pha
-      tya
-      tax
+      tyx
       sta ThisActor
       jsr CallActorInit
     pla
     sta OtherActor
-  pla ; Restore this actor's index
-  tax
+  plx ; Restore this actor's index
   stx ThisActor
 
   sec
-  rts
+  rtl
 Fail:
   clc
-  rts
+  rtl
 .endproc
 
 ; Clears most fields of an actor
+.export ActorClearY
 .proc ActorClearY
   lda #0
   sta ActorType,y
   sta ActorDir,y
-  sta ActorPXL,y
-  sta ActorPYL,y
+  sta ActorPX,y
+  sta ActorPY,y
   sta ActorVar1,y
   sta ActorVar2,y
   sta ActorVar3,y
   sta ActorVar4,y
+  sta ActorVar5,y
+  sta ActorVar6,y
 Stop:
+  lda #0
   sta ActorSpeed,y
-  sta ActorVXL,y
-  sta ActorVXH,y
-  sta ActorVYL,y
-  sta ActorVYH,y
-  rts
+  sta ActorVX,y
+  sta ActorVY,y
+  rtl
 .endproc
 ActorStop = ActorClearY::Stop
 
+.export ActorReverse
 .proc ActorReverse
   lda ActorDir,x
-  eor #16
+  eor #128
   sta ActorDir,x
 
   ; Also negate the velocity
-  lda #0
-  sub ActorVXL,x
-  sta ActorVXL,x
-  lda #0
-  sbc ActorVXH,x
-  sta ActorVXH,x
+  lda ActorVX,x
+  eor #$ffff
+  ina
+  sta ActorVX,x
 
-  lda #0
-  sub ActorVYL,x
-  sta ActorVYL,x
-  lda #0
-  sbc ActorVYH,x
-  sta ActorVYH,x
-  rts
+  lda ActorVY,x
+  eor #$ffff
+  ina
+  sta ActorVY,x
+  rtl
 .endproc
 
 ; Inputs: A (type of actor to destroy)
+.export ActorDestroyType
 .proc ActorDestroyType
-  ldy #NUM_ACTORS-1
+  sta 0
+  ldy #ActorStart
 Loop:
+  lda 0
   cmp ActorType,y
   bne :+
-    pha
-    lda #0
+    tdc ; Clear the accumulator
     sta ActorType,y
-    pla
   :
-  dey
-  bpl :-
-  rts
+  tya
+  add #ActorSize
+  tay
+  cmp #ActorEnd
+  bne Loop
+  rtl
 .endproc
 
 ; Set position to another actor's position
+.export ActorJumpToActor
 .proc ActorJumpToActor
   ldy OtherActor
-  lda ActorPXL,y
-  sta ActorPXL,x
-  lda ActorPXH,y
-  sta ActorPXH,x
-  lda ActorPYL,y
-  sta ActorPYL,x
-  lda ActorPYH,y
-  sta ActorPYH,x
-  rts
+  lda ActorPX,y
+  sta ActorPX,x
+  lda ActorPY,y
+  sta ActorPY,x
+  rtl
 .endproc
 
 ; Inputs: A (X), 0 (Y)
+.export ActorJumpToXY
 .proc ActorJumpToXY
-  sta ActorPXH,x
+  sta ActorPX,x
   lda 0
-  sta ActorPYH,x
-  lda #0
-  sta ActorPXL,x
-  sta ActorPYL,x
-  rts
+  sta ActorPY,x
+  rtl
 .endproc
 
 ; Swap positions
+.export ActorSwapWithActor
 .proc ActorSwapWithActor
   ldy OtherActor
-  swaparray ActorPXL
-  swaparray ActorPXH
-  swaparray ActorPYL
-  swaparray ActorPYH
-  rts
+  swaparray ActorPX
+  swaparray ActorPY
+  rtl
 .endproc
 
 ; Inputs: A (block type), 0 (X), 1 (Y)
@@ -352,12 +325,12 @@ Loop:
     bne GotMask
   :
   lda #255
-  sta 1
+  sta 2
 GotMask:
   ; Now find the number
 
-:  jsr huge_rand
-   and 1 ; Mask it to make the range smaller
+:  jsl random
+   and 2 ; Mask it to make the range smaller
    cmp 0 ; Too big?
    beq :+
    bcs :-
@@ -365,52 +338,57 @@ GotMask:
 .endproc
 
 ; Inputs: A (number the random result has to be greater or equal to)
+.export RandomChance
 .proc RandomChance
   sta 0
-  jsr huge_rand
+  jsl random
   cmp 0
-  rts
+  rtl
 .endproc
 
+.export WinGame
 .proc WinGame
   lda #1
   sta MicrogameWon
-  rts
+  rtl
 .endproc
 
+.export LoseGame
 .proc LoseGame
   lda #1
   sta MicrogameLost
-  rts
+  rtl
 .endproc
 
 ; todo
+.export PlaySoundEffect
 .proc PlaySoundEffect
-  rts
+  rtl
 .endproc
 
-; Test if the actor is in the region defined by A (X1), 0 (X2), 1 (Y1), 2 (Y2)
+; Test if the actor is in the region defined by A (X1), 0 (X2), 2 (Y1), 4 (Y2)
+.export ActorInRegion
 .proc ActorInRegion
-  sta 4
+  sta 6
 
   lda ActorPXH,x
-  cmp 4
+  cmp 6
   bcc No
   cmp 0
   bcs No
 
   lda ActorPYH,x
-  cmp 1
-  bcc No
   cmp 2
+  bcc No
+  cmp 4
   bcs No
 
 Yes:
   sec
-  rts
+  rtl
 No:
   clc
-  rts
+  rtl
 .endproc
 
 ; todo
@@ -419,34 +397,74 @@ No:
   rts
 .endproc
 
+.export ActorLookAtActor
 .proc ActorLookAtActor
   ldy OtherActor
-  lda ActorPXH,x
-  sta 0
-  lda ActorPYH,x
-  sta 1
-  lda ActorPXH,y
-  sta 2
-  lda ActorPYH,y
-  sta 3
 
-  jsr getAngle
+  lda ActorPX,y
+  sub ActorPX,x
+  sta 0
+  lda ActorPY,y
+  sub ActorPY,x
+  sta 2
+  jsl GetAngle512
+  lsr
   sta ActorDir,x
-  ldy OtherActor
-  rts
+  ldy OtherActor ; Is this needed?
+  rtl
 .endproc
 
 ; Look towards a point. A (X) 0 (Y)
+.export ActorLookAtPoint
 .proc ActorLookAtPoint
-  sta 2
+  pha
   lda 0
-  sta 3
-    lda ActorPXH,x
+  sub ActorPY,x
+  sta 2
+  pla
+  sub ActorPX,x
   sta 0
-  lda ActorPYH,x
-  sta 1
-
-  jsr getAngle
+  jsl GetAngle512
+  lsr
   sta ActorDir,x
   rts
 .endproc
+
+; Calculates a horizontal and vertical speed from a speed and an angle
+; input: A (speed) Y (angle, 0-255 times 2)
+; output: 0,1,2 (X position), 2,3,4 (Y position)
+.import MathSinTable, MathCosTable
+.proc SpeedAngle2Offset256
+  php
+  seta8
+  sta M7MUL ; 8-bit factor
+
+  lda MathCosTable+0,y
+  sta M7MCAND ; 16-bit factor
+  lda MathCosTable+1,y
+  sta M7MCAND
+
+  lda M7PRODLO
+  sta 0
+  lda M7PRODHI
+  sta 1
+  lda M7PRODBANK
+  sta 2
+
+  ; --------
+
+  lda MathSinTable+0,y
+  sta M7MCAND ; 16-bit factor
+  lda MathSinTable+1,y
+  sta M7MCAND
+
+  lda M7PRODLO
+  sta 3
+  lda M7PRODHI
+  sta 4
+  lda M7PRODBANK
+  sta 5
+  plp
+  rtl
+.endproc
+.a16
