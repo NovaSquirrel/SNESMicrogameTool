@@ -20,7 +20,6 @@
 # 3. This notice may not be removed or altered from any source distribution.
 #
 import glob, json, math
-from readtiled import *
 
 outfile = None
 gamename = None
@@ -72,6 +71,10 @@ conditions['in-region'] = ('jsl ActorInRegion', 4)
 conditions_flags['in-region'] = 'cc'
 conditions['touching-type'] = ('jsl ActorTouchingType', 1)
 conditions_flags['touching-type'] = 'cc'
+conditions['actor-on-ground'] = 'lda ActorOnGround,x'
+conditions_flags['actor-on-ground'] = 'ne'
+conditions['actor-overlap-block'] = ('jsl ActorOverlapBlock', 1)
+conditions_flags['actor-overlap-block'] = 'cs'
 
 conditions['always'] = 'clc' # dummy, probably shouldn't use
 conditions_flags['always'] = 'cc'
@@ -269,6 +272,8 @@ def cmd_set(a):
 		outfile.write('lda %s\n' % compile_value(a[1]))
 		outfile.write('sta %s\n' % compile_value(a[0]))
 	elif len(a) == 4: #set destination a operator b
+		y_register = a[0].startswith("other-")
+
 		# random numbers
 		if a[2] == 'random': # only constants allowed for now
 			outfile.write('lda #%d\n' % (a[3]-a[1]))
@@ -277,9 +282,9 @@ def cmd_set(a):
 				outfile.write('add #%d\n' % a[1])
 			outfile.write('sta %s\n' % compile_value(a[0]))
 		# Increments and decrements
-		elif a[2] == '+' and a[0] == a[1] and type(a[3]) == int and not a[0].startswith("other-"):
+		elif a[2] == '+' and a[0] == a[1] and type(a[3]) == int and not y_register:
 			outfile.write('inc %s\n' % compile_value(a[0]))
-		elif a[2] == '-' and a[0] == a[1] and type(a[3]) == int and not a[0].startswith("other-"):
+		elif a[2] == '-' and a[0] == a[1] and type(a[3]) == int and not y_register:
 			outfile.write('dec %s\n' % compile_value(a[0]))
 		# Regular math
 		else:
@@ -384,6 +389,10 @@ def compile_value(value):
 		return '#SoundEffect::'+s[1]
 	elif s[0] == 'key':
 		return '#KeyValue::K_'+s[1]
+	elif s[0] == 'block':
+		return ('#%s_Block::' % gamename)+s[1]
+	elif s[0] == 'variable':
+		return 'Variable_'+s[1] #TODO: allocate per-game?
 	else:
 		print("Bad value: "+str(value))
 
@@ -441,14 +450,13 @@ def compile_routine(name, block):
 	compile_block(block)
 	outfile.write('Exit:\nrts\n.endproc\n\n')
 
-def compile_microgame(filename, output):
+def compile_microgame(game, output, name):
 	""" Compile the whole microgame """
 	global outfile, gamename
 
-	game = json.load(open(filename))
 	outfile = open(output, 'w')
 
-	gamename = game['game']['name']
+	gamename = name
 
 	# exports
 	outfile.write('.export %s_ActorPlacement, %s_ActorWidth, %s_ActorHeight, %s_ActorRun, %s_ActorInit, %s_ActorGraphic, %s_Run, %s_Init\n\n' % (gamename, gamename, gamename, gamename, gamename, gamename, gamename, gamename))
@@ -461,11 +469,13 @@ def compile_microgame(filename, output):
 
 	# actor placement
 	outfile.write('.proc %s_ActorPlacement\n' % gamename)
-	for a in game['actor_placement']:
-		outfile.write('.byt %s_ActorType::%s, %d, %d\n' % (gamename, a[0], a[1], a[2]))
+	if 'actor_placement' in game:
+		for a in game['actor_placement']:
+			outfile.write('.byt %s_ActorType::%s, %d, %d\n' % (gamename, a[0], a[1], a[2]))
 	outfile.write('.byt 255\n.endproc\n\n')
 
 	# write widths and heights, and other necessary tables
+	"""
 	outfile.write('.proc %s_ActorWidth\n.byt 0\n' % gamename)
 	for name, actor in game['actors'].items():
 		outfile.write('.byt %d\n' % actor['size'][0])
@@ -475,6 +485,7 @@ def compile_microgame(filename, output):
 	for name, actor in game['actors'].items():
 		outfile.write('.byt %d\n' % actor['size'][1])
 	outfile.write('.endproc\n\n')
+	"""
 
 	outfile.write('.proc %s_ActorRun\n.dbyt (DoNothing-1)\n' % gamename)
 	for name, actor in game['actors'].items():
@@ -492,10 +503,12 @@ def compile_microgame(filename, output):
 			outfile.write('.addr DoNothing\n')
 	outfile.write('.endproc\n\n')
 
+	"""
 	outfile.write('.proc %s_ActorGraphic\n.byt 0\n' % gamename)
 	for name, actor in game['actors'].items():
 		outfile.write('.byt %s\n' % str(actor['graphic']))
 	outfile.write('.endproc\n\n')
+	"""
 
 	# write code
 	if 'run' in game['game']:
@@ -511,12 +524,13 @@ def compile_microgame(filename, output):
 		if 'run' in actor:
 			compile_routine('%s_Actor_Run_%s' % (gamename, name), actor['run'])
 		if 'init' in actor:
-			compile_routine('%s_Actor_Init_%s' % (gamename, name), actor['run'])
+			compile_routine('%s_Actor_Init_%s' % (gamename, name), actor['init'])
 	if 'subroutines' in game:
 		for name, routine in game['subroutines'].items():
 			compile_routine('%s_subroutine_%s' % (gamename, name), routine)
 	outfile.close()
 
+"""
 allmicrogames = open('allmicrogames.s', 'w')
 allmicrogames.write('.code\n')
 all_gamenames = []
@@ -533,3 +547,4 @@ for e in ['ActorPlacement', 'ActorWidth', 'ActorHeight', 'ActorRun', 'ActorInit'
 		allmicrogames.write('.addr %s_%s\n' % (name, e))
 	allmicrogames.write('.endproc\n\n')
 allmicrogames.close()
+"""

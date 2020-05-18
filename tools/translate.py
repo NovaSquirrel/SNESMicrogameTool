@@ -80,7 +80,7 @@ class Block(object):
 		elif block.type == 'block_type':
 			return 'block:'+block.field['NAME']
 		elif block.type == 'coordinate_pixels':
-			return str(16*int(block.field['NUM']))
+			return 16*int(block.field['NUM'])
 		elif block.type == 'variables_get':
 			return 'variable:'+block.field['VAR']
 		else:
@@ -509,8 +509,4 @@ def translate_xml(filename):
 			out['game']['length'] = 8 if (block.field['LONG'] == 'TRUE') else 4
 		else:
 			print("Unexpected block? "+block.type)
-
-	print(out)
-
-translate_xml('microgame.xml')
-
+	return out

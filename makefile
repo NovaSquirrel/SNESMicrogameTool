@@ -10,15 +10,15 @@
 #
 
 # These are used in the title of the SFC program and the zip file.
-title = lorom-template
-version = 0.06
+title = microgame
+version = 0.01
 
 # Space-separated list of asm files without .s extension
 # (use a backslash to continue on the next line)
 objlist = \
   snesheader init main bg player \
   ppuclear blarggapu spcimage musicseq memory \
-  math sincos_data
+  math sincos_data gamedata
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \
@@ -31,11 +31,7 @@ objdir := obj/snes
 srcdir := src
 imgdir := tilesets
 
-# If it's not bsnes, it's just BS.  But I acknowledge that being
-# stuck on an old Atom laptop is BS.  Atom N450 can't run bsnes at
-# full speed, but the Atom-based Pentium N3710 can.
 ifndef SNESEMU
-#SNESEMU := xterm -e zsnes -d
 SNESEMU := ./mesen-s
 endif
 
@@ -65,13 +61,6 @@ wincwd := $(shell pwd | sed -e "s'/'\\\\\\\\'g")
 # NO$SNS in Wine, you should move run above nocash-run.
 run: $(title).sfc
 	$(SNESEMU) $<
-
-# Per Martin Korth on 2014-09-16: NO$SNS requires absolute
-# paths because he screwed up and made the filename processing
-# too clever.
-# Not default 
-nocash-run: $(title).sfc
-	wine "C:\\Program Files (x86)\\nocash\\no\$$sns.exe" "Z:$(wincwd)\\$(title).sfc"
 
 # Special target for just the SPC700 image
 spcrun: $(title).spc
@@ -129,6 +118,8 @@ $(objdir)/player.o: \
  $(objdir)/swinging2.chrsfc
 $(objdir)/spcimage.o: $(brrlisto)
 $(objdir)/musicseq.o $(objdir)/spcimage.o: src/pentlyseq.inc
+$(srcdir)/gamedata.s: $(foreach dir, $(games/example/), $(wildcard $(dir)/*))
+	$(PY) tools/makegame.py
 
 # Rules for CHR data
 
