@@ -1,6 +1,7 @@
 .globalzp keydown
 .globalzp keynew
 .globalzp keylast
+.globalzp seed
 .globalzp retraces
 .globalzp OamPtr
 .globalzp MicrogameTime
@@ -22,6 +23,7 @@
 .global   ActorStart
 .globalzp ActorSize
 .global   ActorEnd
+.global   INVALID_ACTOR
 
 ActorLen = 20
 .globalzp ActorType
@@ -38,6 +40,17 @@ ActorLen = 20
 .globalzp ActorDirection
 .globalzp ActorArt
 .globalzp ActorSpeed
+.globalzp ActorOnGround
+
+.globalzp GameDataPointer
+.globalzp GameDataPointer_BlockUL
+.globalzp GameDataPointer_BlockUR
+.globalzp GameDataPointer_BlockLL
+.globalzp GameDataPointer_BlockLR
+.globalzp GameDataPointer_BlockFlags
+.globalzp GameDataPointer_ActorRun
+.globalzp GameDataPointer_ActorInit
+
 
 .global OAM
 .global OAMHI

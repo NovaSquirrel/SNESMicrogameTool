@@ -18,3 +18,39 @@
 
 ; blarggapu.s
 .global spc_boot_apu
+
+
+; Behavior primitives
+.global random
+.global RandomWithMaxConstant
+.global ActorBallMovement
+.global ActorBallMovementStop
+.global ActorBallMovementReflect
+.global ActorBallMovementBounce
+.global ActorApplyVelocity
+.global VectorMovementStop
+.global VectorMovementReflect
+.global Actor8WayMovement
+.global WinGame
+.global LoseGame
+.global ActorJumpToXY
+.global ActorJumpToActor
+.global ActorSwapWithActor
+.global ActorDestroyType
+.global ActorStop
+.global ActorReverse
+.global ActorCreateAtXY
+.global PlaySoundEffect
+.global ActorFindType
+.global ActorLookAtPoint
+.global ActorApplyGravity
+.global ActorFall
+.global BlockTargetXY
+.global BlockTargetCoordinate
+.global BlockTargetActorXY
+.global BlockChangeType
+
+.global RandomChance
+.global ActorInRegion
+.global ActorTouchingType
+.global ActorOverlapBlock

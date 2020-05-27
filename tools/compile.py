@@ -38,7 +38,7 @@ def insert_label(label):
 # -----------------------------------------------------------------------------
 
 conditions = {}
-conditions_flags = {}
+conditions_flags = {} # The branch condition for if the condition is -not- true
 
 conditions['find-type'] = ('jsl ActorFindType', 1)
 conditions_flags['find-type'] = 'cc'
@@ -72,9 +72,9 @@ conditions_flags['in-region'] = 'cc'
 conditions['touching-type'] = ('jsl ActorTouchingType', 1)
 conditions_flags['touching-type'] = 'cc'
 conditions['actor-on-ground'] = 'lda ActorOnGround,x'
-conditions_flags['actor-on-ground'] = 'ne'
+conditions_flags['actor-on-ground'] = 'eq'
 conditions['actor-overlap-block'] = ('jsl ActorOverlapBlock', 1)
-conditions_flags['actor-overlap-block'] = 'cs'
+conditions_flags['actor-overlap-block'] = 'cc'
 
 conditions['always'] = 'clc' # dummy, probably shouldn't use
 conditions_flags['always'] = 'cc'
@@ -276,16 +276,31 @@ def cmd_set(a):
 
 		# random numbers
 		if a[2] == 'random': # only constants allowed for now
-			outfile.write('lda #%d\n' % (a[3]-a[1]))
-			outfile.write('jsl RandomWithMax\n')
+			power2test = math.log2(a[3]-a[1]+1)
+			is_power_of_2 = power2test == int(power2test)
+			mask = pow(2, math.ceil(power2test))-1
+
+			if is_power_of_2:
+				outfile.write('jsl random\nand #%d\n' % mask)
+			else:
+				# Mask
+				outfile.write('lda #%d\nsta 0\n' % mask)
+				# Highest allowed
+				outfile.write('lda #%d\n' % (a[3]-a[1]))
+				outfile.write('jsl RandomWithMaxConstant\n')
 			if a[1] != 0:
 				outfile.write('add #%d\n' % a[1])
 			outfile.write('sta %s\n' % compile_value(a[0]))
 		# Increments and decrements
-		elif a[2] == '+' and a[0] == a[1] and type(a[3]) == int and not y_register:
+		# TODO: was there previously some logic that made it check for incrementing by 1? it didn't seem like there was
+		elif a[2] == '+' and a[0] == a[1] and type(a[3]) == int and not y_register and a[3] == 1:
 			outfile.write('inc %s\n' % compile_value(a[0]))
-		elif a[2] == '-' and a[0] == a[1] and type(a[3]) == int and not y_register:
+		elif a[2] == '+' and a[0] == a[1] and type(a[3]) == int and not y_register and a[3] == -1:
 			outfile.write('dec %s\n' % compile_value(a[0]))
+		elif a[2] == '-' and a[0] == a[1] and type(a[3]) == int and not y_register and a[3] == 1:
+			outfile.write('dec %s\n' % compile_value(a[0]))
+		elif a[2] == '-' and a[0] == a[1] and type(a[3]) == int and not y_register and a[3] == -1:
+			outfile.write('inc %s\n' % compile_value(a[0]))
 		# Regular math
 		else:
 			outfile.write('lda %s\n' % compile_value(a[1]))
@@ -313,7 +328,7 @@ actions['set'] = cmd_set
 
 values = {}
 values ['type']         = 'ActorType,x'
-values ['direction']    = 'ActorDir,x'
+values ['direction']    = 'ActorDirection,x'
 values ['speed']        = 'ActorSpeed,x'
 values ['x-position']   = 'ActorPX,x'
 values ['y-position']   = 'ActorPY,x'
@@ -327,7 +342,7 @@ values ['var5']         = 'ActorVarE,x'
 values ['var6']         = 'ActorVarF,x'
 
 values ['other-type']         = 'ActorType,y'
-values ['other-direction']    = 'ActorDir,y'
+values ['other-direction']    = 'ActorDirection,y'
 values ['other-speed']        = 'ActorSpeed,y'
 values ['other-x-position']   = 'ActorPX,y'
 values ['other-y-position']   = 'ActorPY,y'
@@ -376,7 +391,10 @@ values ['block-target-class'] = 'BlockTargetClass'
 
 def compile_value(value):
 	if type(value) == int:
-		return '#'+str(value)
+		if value < 0:
+			return '#.loword('+str(value)+')'
+		else:
+			return '#'+str(value)
 	if value in values:
 		return values[value]
 	# pick from a namespace
@@ -422,24 +440,45 @@ def compile_block(block):
 				print('Unknown action: %s' % name)
 			outfile.write('\n') # spacing between actions
 		elif type(action) == dict:
-			""" Condition """
-			exit = next_label()
-			not_else = next_label() # get an else label if needed or not
+			""" Condition/loop """
+			if 'if' in action:
+				exit = next_label()
+				not_else = next_label() # get an else label even if it's not needed
 
-			# make the code to skip over the 'then' block
-			compile_condition(action['if'], exit, False)
+				# make the code to skip over the 'then' block
+				compile_condition(action['if'], exit, False)
 
-			# compile the 'then' block
-			compile_block(action['then'])
+				# compile the 'then' block
+				compile_block(action['then'])
 
-			# put "else" if necessary
-			if 'else' in action:
-				outfile.write('jmp %s\n' % label_name(not_else))
-			insert_label(exit)
-			if 'else' in action:
-				compile_block(action['else'])
-				insert_label(not_else)
+				# put "else" if necessary
+				if 'else' in action:
+					outfile.write('jmp %s\n' % label_name(not_else))
+				insert_label(exit)
+				if 'else' in action:
+					compile_block(action['else'])
+					insert_label(not_else)
+			elif 'while' in action:
+				top = next_label()
+				exit = next_label()
 
+				# make the code to skip over the 'then' block
+				insert_label(top)
+				compile_condition(action['if'], exit, False)
+
+				# compile the 'then' block
+				compile_block(action['then'])
+
+				# go back to the top, and that'll exit the loop if needed
+				outfile.write('jmp %s\n' % label_name(top))
+				insert_label(exit)
+			elif 'dowhile' in action:
+				top = next_label()
+				insert_label(top)
+				compile_block(action['do'])
+				compile_condition(action['dowhile'], top, True)
+			else:
+				print("Unrecognized conditional/loop "+str(action))
 			outfile.write('\n') # spacing between actions
 		else:
 			print('Item in block is the wrong type')
@@ -450,7 +489,7 @@ def compile_routine(name, block):
 	compile_block(block)
 	outfile.write('Exit:\nrts\n.endproc\n\n')
 
-def compile_microgame(game, output, name):
+def compile_microgame(game, output, name, maps):
 	""" Compile the whole microgame """
 	global outfile, gamename
 
@@ -458,8 +497,39 @@ def compile_microgame(game, output, name):
 
 	gamename = name
 
-	# exports
-	outfile.write('.export %s_ActorPlacement, %s_ActorWidth, %s_ActorHeight, %s_ActorRun, %s_ActorInit, %s_ActorGraphic, %s_Run, %s_Init\n\n' % (gamename, gamename, gamename, gamename, gamename, gamename, gamename, gamename))
+	# exports and includes
+	outfile.write('.include "../../snes.inc"\n')
+	outfile.write('.include "../../global.inc"\n')
+	outfile.write('.include "../../memory.inc"\n')
+	outfile.write('.a16\n')
+	outfile.write('.i16\n')
+	outfile.write('.export %s_GameData\n\n' % gamename)
+
+	outfile.write('.segment "GameChr_%s"\n\n' % gamename)
+	# chr data
+	outfile.write('.proc %s_ChrData\n' % gamename)
+	for tile in maps.map_chr:
+		outfile.write('  .byt %s\n' % (', '.join(['$%.2X' % x for x in tile])))
+	outfile.write('.endproc\n%s_EndChrData:\n\n' % gamename)
+
+	outfile.write('.segment "BSS"\n\n')
+	for v in game['variables']:
+		outfile.write('Variable_%s: .res 2\n' % v)
+
+	outfile.write('.segment "GameData_%s"\n\n' % gamename)
+	outfile.write('.proc %s_GameData\n' % gamename)
+	outfile.write('.addr %s_PalData\n' % gamename)
+	outfile.write('.byt ^%s_ChrData\n' % gamename)
+	outfile.write('.addr %s_ChrData\n' % gamename)
+	outfile.write('.addr %s_BlockTopLeft\n' % gamename)
+	outfile.write('.addr %s_BlockTopRight\n' % gamename)
+	outfile.write('.addr %s_BlockBottomLeft\n' % gamename)
+	outfile.write('.addr %s_BlockBottomRight\n' % gamename)
+	outfile.write('.addr %s_BlockFlags\n' % gamename)
+	outfile.write('.addr %s_MapList\n' % gamename)
+	outfile.write('.addr %s_ActorRun\n' % gamename)
+	outfile.write('.addr %s_ActorInit\n' % gamename)
+	outfile.write('.endproc\n\n')
 
 	# actor type list
 	outfile.write('.enum %s_ActorType\nempty\n' % gamename)
@@ -467,12 +537,73 @@ def compile_microgame(game, output, name):
 		outfile.write(name+'\n')
 	outfile.write('.endenum\n\n')
 
-	# actor placement
-	outfile.write('.proc %s_ActorPlacement\n' % gamename)
-	if 'actor_placement' in game:
-		for a in game['actor_placement']:
-			outfile.write('.byt %s_ActorType::%s, %d, %d\n' % (gamename, a[0], a[1], a[2]))
-	outfile.write('.byt 255\n.endproc\n\n')
+	outfile.write('.proc %s_PalData\n' % gamename)
+	for pal in maps.map_palettes:
+		outfile.write('  .word %s\n' % (', '.join(['RGB8(%d,%d,%d)' % x for x in pal])))
+	outfile.write('.endproc\n%s_EndPalData:\n\n' % gamename)
+
+	# export the block data
+	all_blocks = [None] + list(maps.map_tiles_used) # <--- convert to a list so we can find an index in it
+
+	# write the four tiles used for each block
+	for corner, cornerx, cornery in [('TopLeft', 0, 0), ('TopRight', 0, 1), ('BottomLeft', 1, 0), ('BottomRight', 1, 1)]:
+		outfile.write('.proc %s_Block%s\n' % (gamename, corner))
+		outfile.write('.word 0\n')
+		for block in maps.map_tiles_used:
+			data = maps.blocks[block]
+			out = data['chr'][cornerx][cornery] | (data['palette']<<10)
+			if data['xflip'][cornerx][cornery]:
+				out |= 0x4000
+			if data['yflip'][cornerx][cornery]:
+				out |= 0x8000
+			outfile.write('.word %d\n' % out)
+		outfile.write('.endproc\n\n')
+
+	# write flags for each block
+	outfile.write('.proc %s_BlockFlags\n' % gamename)
+	outfile.write('.byt 0\n')
+	for block in maps.map_tiles_used:
+		data = maps.blocks[block]['data']
+		if data:
+			out = 0
+			if 'solid' in data and data['solid']:
+				out |= 0xc0
+			if 'solid_top' in data and data['solid_top']:
+				out |= 0x40
+			outfile.write('.byt %d\n' % out)
+		else:
+			outfile.write('.byt 0\n')
+	outfile.write('.endproc\n\n')
+
+	# write enums for each block
+	outfile.write('.enum %s_Block\nempty = 0\n' % gamename)
+	for block in maps.map_tiles_used:
+		data = maps.blocks[block]['data']
+		if data and 'name' in data:
+			outfile.write('%s = %d\n' % (data['name'], all_blocks.index(block)))
+	outfile.write('.endenum\n\n')
+
+	# write the list of maps
+	outfile.write('.proc %s_MapList\n' % gamename)
+	for map in maps.maps:
+		outfile.write('.addr %s_MapData_%s\n' % (gamename, map.name))
+	outfile.write('.endproc\n\n')
+
+	# and the map data
+	for map in maps.maps:
+		outfile.write('.proc %s_MapData_%s\n' % (gamename, map.name))
+		outfile.write('.addr Actors\n')
+		outfile.write('.byt %d, %d\n' % (map.map_width, map.map_height))
+
+		for row in map.map_data:
+			outfile.write('.byt %s\n' % (','.join([str(all_blocks.index(x)) for x in row])))
+
+		outfile.write('Actors:\n')
+		for a in map.actor_list:
+			outfile.write('.byt %s_ActorType::%s, <%d, >%d, <%d, >%d, %d\n' % (gamename, a[0], a[1], a[1], a[2], a[2], a[3]))
+		outfile.write('.byt 255\n')
+
+		outfile.write('.endproc\n\n')
 
 	# write widths and heights, and other necessary tables
 	"""
@@ -487,20 +618,20 @@ def compile_microgame(game, output, name):
 	outfile.write('.endproc\n\n')
 	"""
 
-	outfile.write('.proc %s_ActorRun\n.dbyt (DoNothing-1)\n' % gamename)
+	outfile.write('.proc %s_ActorRun\n.addr 0\n' % gamename)
 	for name, actor in game['actors'].items():
 		if 'run' in actor:
 			outfile.write('.addr %s_Actor_Run_%s\n' % (gamename, name))
 		else:
-			outfile.write('.addr DoNothing\n')
+			outfile.write('.addr 0\n')
 	outfile.write('.endproc\n\n')
 
-	outfile.write('.proc %s_ActorInit\n.addr DoNothing\n' % gamename)
+	outfile.write('.proc %s_ActorInit\n.addr 0\n' % gamename)
 	for name, actor in game['actors'].items():
 		if 'init' in actor:
-			outfile.write('.addr %s_Actor_Init_%s-1\n' % (gamename, name))
+			outfile.write('.addr %s_Actor_Init_%s\n' % (gamename, name))
 		else:
-			outfile.write('.addr DoNothing\n')
+			outfile.write('.addr 0\n')
 	outfile.write('.endproc\n\n')
 
 	"""
@@ -528,6 +659,7 @@ def compile_microgame(game, output, name):
 	if 'subroutines' in game:
 		for name, routine in game['subroutines'].items():
 			compile_routine('%s_subroutine_%s' % (gamename, name), routine)
+
 	outfile.close()
 
 """

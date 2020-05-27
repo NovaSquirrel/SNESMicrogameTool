@@ -28,6 +28,7 @@
   keylast: .res 2
   retraces: .res 2
   OamPtr: .res 2
+  seed: .res 4
 
   MicrogameTime:       .res 2 ; Game frames
   MicrogameRealFrames: .res 2 ; Used to determine when to run everything twice
@@ -46,8 +47,18 @@
   ThisActor:  .res 2 ; current actor
   OtherActor: .res 2 ; the other actor
 
+  ; Pointers for the current game's data
+  GameDataPointer: .res 3
+  GameDataPointer_BlockUL:    .res 3
+  GameDataPointer_BlockUR:    .res 3
+  GameDataPointer_BlockLL:    .res 3
+  GameDataPointer_BlockLR:    .res 3
+  GameDataPointer_BlockFlags: .res 3
+  GameDataPointer_ActorRun:   .res 3
+  GameDataPointer_ActorInit:  .res 3
+
 .segment "BSS"
-  ActorSize = 14*2
+  ActorSize = 15*2
   ActorStart: .res ActorLen*ActorSize
   ActorEnd:
   INVALID_ACTOR: .res ActorSize ; dummy
@@ -66,6 +77,7 @@
   ActorDirection    = 22 ;
   ActorArt          = 24 ;
   ActorSpeed        = 26 ;
+  ActorOnGround     = 28 ;
 
   OAM:   .res 512
   OAMHI: .res 512

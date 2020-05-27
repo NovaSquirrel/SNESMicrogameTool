@@ -1584,5 +1584,25 @@ Blockly.defineBlocksWithJsonArray([{
   "colour": 210,
   "tooltip": "",
   "helpUrl": ""
+},
+{
+  "type": "do_while",
+  "message0": "do %1 while %2",
+  "args0": [
+    {
+      "type": "input_statement",
+      "name": "DO"
+    },
+    {
+      "type": "input_value",
+      "name": "BOOL",
+      "check": "Boolean"
+    }
+  ],
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": 120,
+  "tooltip": "",
+  "helpUrl": ""
 }
 ]);

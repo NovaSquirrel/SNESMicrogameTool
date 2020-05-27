@@ -64,6 +64,7 @@
         <field name="DOWN">FALSE</field>
         <field name="UP">FALSE</field>
         <field name="RIGHT">TRUE</field>
+        <field name="COLLIDE">TRUE</field>
         <next>
           <block type="apply_gravity" id="8jqAGM*9X8U#2[]:iwdb">
             <field name="COLLIDE">TRUE</field>
@@ -117,7 +118,7 @@
                       <block type="block_change_type" id="pI2zAEN5R=BT76*Jl72v">
                         <value name="NAME">
                           <block type="block_type" id="p{~`@,px68J%Fd0|*}*8">
-                            <field name="NAME">air</field>
+                            <field name="NAME">empty</field>
                           </block>
                         </value>
                         <next>
@@ -147,7 +148,7 @@
                           <block type="block_change_type" id=")vqE.rn7]/GiV7[n4p[p">
                             <value name="NAME">
                               <block type="block_type" id="M||O{S{ei=qXBhgcoq@Z">
-                                <field name="NAME">air</field>
+                                <field name="NAME">empty</field>
                               </block>
                             </value>
                             <next>
@@ -197,7 +198,7 @@
                               <block type="block_change_type" id="|={6J4*5ID+$+zub?Nst">
                                 <value name="NAME">
                                   <block type="block_type" id="cOtPLfzz!8y)D5!*tm)D">
-                                    <field name="NAME">air</field>
+                                    <field name="NAME">empty</field>
                                   </block>
                                 </value>
                                 <next>
@@ -229,6 +230,9 @@
         </next>
       </block>
     </statement>
+  </block>
+  <block type="actor" id="u*O[LN^?1Wg!;5M9{?2G" x="1138" y="271">
+    <field name="NAME">bread</field>
   </block>
   <block type="actor" id="+hj%Tuw^=2bh/Y,-|}=E" x="64" y="370">
     <field name="NAME">youmarker</field>
@@ -341,7 +345,7 @@
         </value>
         <value name="RIGHT">
           <block type="math_number" id="S{E4sebSkd`/WI,z_ts5">
-            <field name="NUM">511</field>
+            <field name="NUM">255</field>
           </block>
         </value>
         <next>

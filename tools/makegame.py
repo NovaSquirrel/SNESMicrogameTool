@@ -25,13 +25,13 @@ from readtiled import *
 
 
 def make_game(game_name):
-	game_directory = 'games/%s/' % game_name
+	game_directory = 'src/games/%s/' % game_name
 	print("Building game %s" % game_name)
 	info = translate_xml(game_directory+'microgame.xml')
+#	import json
+#	print(json.dumps(info, indent=2))
 
-	#import json
-	#print(json.dumps(info, indent=2))
-
-	compile_microgame(info, game_directory+'microgame.s', game_name)
+	maps = TiledMapSet(game_directory, ['map.tmx'])
+	compile_microgame(info, game_directory+'microgame.s', game_name, maps)
 
 make_game('example')

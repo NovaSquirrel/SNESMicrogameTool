@@ -16,9 +16,9 @@ version = 0.01
 # Space-separated list of asm files without .s extension
 # (use a backslash to continue on the next line)
 objlist = \
-  snesheader init main bg player \
+  snesheader init main bg player primitives \
   ppuclear blarggapu spcimage musicseq memory \
-  math sincos_data gamedata
+  math sincos_data runmicrogame games/example/microgame
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \

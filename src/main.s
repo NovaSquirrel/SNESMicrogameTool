@@ -40,7 +40,7 @@ USE_AUDIO = 1
   rti
 .endproc
 
-.segment "CODE1"
+.segment "CODE"
 ; init.s sends us here
 .proc main
 
@@ -54,6 +54,11 @@ USE_AUDIO = 1
   .if ::USE_AUDIO
     jsl spc_boot_apu
   .endif
+
+  .import StartMicrogame
+  jml StartMicrogame
+
+
 
   jsl load_bg_tiles  ; fill pattern table
   jsl draw_bg        ; fill nametable

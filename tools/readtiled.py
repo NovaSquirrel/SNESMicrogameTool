@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import xml.etree.ElementTree as ET # phone home
-import PIL
+import PIL, os
 from PIL import Image
 
 def tilestring_hflip(ts):
@@ -41,6 +41,14 @@ def tilestring_bytes(ts):
 	return a+b
 
 class TiledMap():
+	# name
+	# map_width
+	# map_height
+	# map_data
+	# actor_list
+
+	# map_tiles_used
+	# map_tilesets_used
 	def __init__(self, filename):
 		print("Parsing %s" % filename)
 
@@ -51,6 +59,7 @@ class TiledMap():
 		map_height = int(root.attrib['height'])
 		self.map_width = map_width
 		self.map_height = map_height
+		self.name = os.path.splitext(os.path.basename(filename))[0]
 
 		bgcolor = root.attrib['backgroundcolor'][1:]
 		self.bgcolor = (int(bgcolor[0:2], 16), int(bgcolor[2:4], 16), int(bgcolor[4:6], 16))
@@ -163,7 +172,7 @@ class TiledMapSet():
 	# map_tiles_used		list of tiles used in (tileset.tsx, index within) format
 	# map_tilesets_used		list of tilesets used
 
-	def __init__(self, files):
+	def __init__(self, base, files):
 		self.map_tiles_used = set()
 		self.map_tilesets_used = set()
 		self.maps = []			# Every map in order
@@ -172,7 +181,7 @@ class TiledMapSet():
 
 		# Parse each map
 		for f in files:
-			map = TiledMap(f)
+			map = TiledMap(base+f)
 			self.maps.append(map)
 			# Keep track of what tiles and tilesets are used across all of the maps
 			self.map_tiles_used = self.map_tiles_used.union(map.map_tiles_used)
@@ -183,8 +192,8 @@ class TiledMapSet():
 		images = {}
 		palette_for_tileset = {}
 		for f in self.map_tilesets_used:
-			tilesets[f] = TiledMapTileset(f)
-			images[f] = Image.open(tilesets[f].image)
+			tilesets[f] = TiledMapTileset(base+f)
+			images[f] = Image.open(base+tilesets[f].image)
 
 			# Extract the palette
 			pal = images[f].getpalette()[3:]

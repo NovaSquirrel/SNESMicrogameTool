@@ -42,7 +42,7 @@
 
 .export ActorBallMovement
 .proc ActorBallMovement
-  lda ActorDir,x ; Multiply by 2 because SpeedAngle2Offset256 expects it to be doubled already
+  lda ActorDirection,x ; Multiply by 2 because SpeedAngle2Offset256 expects it to be doubled already
   and #$00ff     ; Just to be sure
   asl
   tay
@@ -87,9 +87,9 @@
   lda 0
   and #KEY_UP
   beq :+
-    lda ActorPYH,x
+    lda ActorPY,x
     sub ActorSpeed,x
-    sta ActorPYH,x
+    sta ActorPY,x
   :
   rtl
 .endproc
@@ -138,15 +138,16 @@ Found:
 
 ; Inputs: 0(X), 2(Y), A(Type)
 ; Outputs: OtherActor (index)
+.export ActorCreateAtXY
 .proc ActorCreateAtXY
-  sta Type
+  sta 4
   jsl ActorFindFree
   bcc Fail
   jsl ActorClearY
   lda 0
-  sta ActorPXH,y
+  sta ActorPX,y
   lda 2
-  sta ActorPYH,y
+  sta ActorPY,y
   lda 4
   sta ActorType,y
 
@@ -155,7 +156,7 @@ Found:
     pha
       tyx
       sta ThisActor
-      jsr CallActorInit
+      jsl CallActorInit
     pla
     sta OtherActor
   plx ; Restore this actor's index
@@ -168,20 +169,37 @@ Fail:
   rtl
 .endproc
 
+.export CallActorInit
+.proc CallActorInit
+  ; I'll assume the data bank is already set correctly
+  seta8
+  lda GameDataPointer+2
+  sta 2
+  seta16
+
+  ldy ActorType,x
+  lda [GameDataPointer_ActorInit],y
+  bne :+
+    rtl
+  :
+  sta 0  
+  jml [0]
+.endproc
+
 ; Clears most fields of an actor
 .export ActorClearY
 .proc ActorClearY
   lda #0
   sta ActorType,y
-  sta ActorDir,y
+  sta ActorDirection,y
   sta ActorPX,y
   sta ActorPY,y
-  sta ActorVar1,y
-  sta ActorVar2,y
-  sta ActorVar3,y
-  sta ActorVar4,y
-  sta ActorVar5,y
-  sta ActorVar6,y
+  sta ActorVarA,y
+  sta ActorVarB,y
+  sta ActorVarC,y
+  sta ActorVarD,y
+  sta ActorVarE,y
+  sta ActorVarF,y
 Stop:
   lda #0
   sta ActorSpeed,y
@@ -193,9 +211,9 @@ ActorStop = ActorClearY::Stop
 
 .export ActorReverse
 .proc ActorReverse
-  lda ActorDir,x
+  lda ActorDirection,x
   eor #128
-  sta ActorDir,x
+  sta ActorDirection,x
 
   ; Also negate the velocity
   lda ActorVX,x
@@ -259,25 +277,18 @@ Loop:
   rtl
 .endproc
 
-; Inputs: A (block type), 0 (X), 1 (Y)
-.proc SetBlock
+.a16
+.proc RandomWithMaxConstant
   sta 2
-
-  lda 1
-  asl
-  asl
-  asl
-  asl
-  ora 0
-  tay
-
-  lda 2
-  sta LevelMap,y
-
-  ; todo: actually change the block onscreen
-  rts
+: jsl random
+  and 0 ; Mask supplied in 0
+  cmp 2 ; Too big?
+  beq :+
+  bcs :-
+: rtl
 .endproc
 
+.if 0
 ; Inputs: A (maximum value allowed)
 .proc RandomWithMax
   sta 0
@@ -329,13 +340,14 @@ Loop:
 GotMask:
   ; Now find the number
 
-:  jsl random
-   and 2 ; Mask it to make the range smaller
-   cmp 0 ; Too big?
-   beq :+
-   bcs :-
-:  rts
+: jsl random
+  and 2 ; Mask it to make the range smaller
+  cmp 0 ; Too big?
+  beq :+
+  bcs :-
+: rts
 .endproc
+.endif
 
 ; Inputs: A (number the random result has to be greater or equal to)
 .export RandomChance
@@ -371,13 +383,13 @@ GotMask:
 .proc ActorInRegion
   sta 6
 
-  lda ActorPXH,x
+  lda ActorPX,x
   cmp 6
   bcc No
   cmp 0
   bcs No
 
-  lda ActorPYH,x
+  lda ActorPY,x
   cmp 2
   bcc No
   cmp 4
@@ -407,9 +419,10 @@ No:
   lda ActorPY,y
   sub ActorPY,x
   sta 2
+  .import GetAngle512
   jsl GetAngle512
   lsr
-  sta ActorDir,x
+  sta ActorDirection,x
   ldy OtherActor ; Is this needed?
   rtl
 .endproc
@@ -424,9 +437,10 @@ No:
   pla
   sub ActorPX,x
   sta 0
+  .import GetAngle512
   jsl GetAngle512
   lsr
-  sta ActorDir,x
+  sta ActorDirection,x
   rts
 .endproc
 
@@ -468,3 +482,63 @@ No:
   rtl
 .endproc
 .a16
+
+.proc random
+  phx ; Needed because setaxy8 will clear the high byte of X
+  phy
+  php
+  setaxy8
+  tdc ; Clear A, including the high byte
+
+  ; rotate the middle bytes left
+  ldy seed+2 ; will move to seed+3 at the end
+  lda seed+1
+  sta seed+2
+  ; compute seed+1 ($C5>>1 = %1100010)
+  lda seed+3 ; original high byte
+  lsr
+  sta seed+1 ; reverse: 100011
+  lsr
+  lsr
+  lsr
+  lsr
+  eor seed+1
+  lsr
+  eor seed+1
+  eor seed+0 ; combine with original low byte
+  sta seed+1
+  ; compute seed+0 ($C5 = %11000101)
+  lda seed+3 ; original high byte
+  asl
+  eor seed+3
+  asl
+  asl
+  asl
+  asl
+  eor seed+3
+  asl
+  asl
+  eor seed+3
+  sty seed+3 ; finish rotating byte 2 into 3
+  sta seed+0
+
+  plp
+  ply
+  plx
+  rtl
+.endproc
+
+.export ActorFall
+.proc ActorFall
+  rtl
+.endproc
+
+.export ActorOverlapBlock
+.proc ActorOverlapBlock
+  rtl
+.endproc
+
+.export BlockChangeType
+.proc BlockChangeType
+  rtl
+.endproc

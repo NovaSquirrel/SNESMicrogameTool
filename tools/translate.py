@@ -371,12 +371,20 @@ def blk_play_sfx(block):
 blocks['play_sfx'] = blk_play_sfx
 
 def blk_controls_whileUntil(block):
-	mode = block.field['MODE'].lower()
 	out = {}
-	out[mode] = translate_condition(block.value['BOOL'])
+	out['while'] = translate_condition(block.value['BOOL'])
+	if block.field['MODE'].lower() == 'until': # Apparently "until" is just an inverse while, not a do-until
+		out['while'].insert('not', 0)
 	out['do'] = translate_routine(block.statement['DO'])
 	return out
 blocks['controls_whileUntil'] = blk_controls_whileUntil
+
+def blk_do_while(block):
+	out = {}
+	out['dowhile'] = translate_condition(block.value['BOOL'])
+	out['do'] = translate_routine(block.statement['DO'])
+	return out
+blocks['do_while'] = blk_do_while
 
 def blk_apply_gravity(block):
 	if block.field['COLLIDE'] == 'TRUE':
@@ -409,7 +417,7 @@ def blk_math_change(block):
 	return ['set',
 		'variable:'+block.field['VAR'],
 		'variable:'+block.field['VAR'],
-		'-',
+		'+',
 		block.translate_value('DELTA')]
 blocks['math_change'] = blk_math_change
 

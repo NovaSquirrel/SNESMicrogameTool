@@ -331,6 +331,21 @@ KEY_X      = $0040
 KEY_L      = $0020
 KEY_R      = $0010
 
+.enum KeyValue
+  K_B      = $8000
+  K_Y      = $4000
+  K_SELECT = $2000
+  K_START  = $1000
+  K_UP     = $0800
+  K_DOWN   = $0400
+  K_LEFT   = $0200
+  K_RIGHT  = $0100
+  K_A      = $0080
+  K_X      = $0040
+  K_L      = $0020
+  K_R      = $0010
+.endenum
+
 ; S-CPU multiply and divide ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; Multiply unit.  Also good for shifting pixels when drawing
