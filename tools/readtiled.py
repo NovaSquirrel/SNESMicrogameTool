@@ -46,6 +46,7 @@ class TiledMap():
 	# map_height
 	# map_data
 	# actor_list
+	# bgcolor
 
 	# map_tiles_used
 	# map_tilesets_used
@@ -213,9 +214,9 @@ class TiledMapSet():
 				palette_for_tileset[f] = self.map_palettes.index(triplets)
 
 		# Get all of the palettes and pixel data
-		self.map_chr = []
+		self.map_chr = [tilestring_bytes('0'*64)]
 		self.blocks = {}
-		tilestrings = []
+		tilestrings = ['0'*64]
 		for tileset, within in self.map_tiles_used:
 			block = {'palette': palette_for_tileset[tileset],
 					 'chr': [[None, None],[None, None]],

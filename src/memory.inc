@@ -7,6 +7,8 @@
 .globalzp MicrogameTime
 .globalzp MicrogameRealFrames
 .globalzp MicrogameFrames
+.globalzp DecodePointer, LevelBlockPtr
+.globalzp ScrollX, ScrollY, TempVal
 
 .globalzp MicrogameDifficulty
 .globalzp MicrogameWon
@@ -16,6 +18,9 @@
 
 .globalzp MicrogameGlobals
 .globalzp MicrogameTemp
+
+.globalzp MapWidth
+.globalzp MapHeight
 
 .globalzp ThisActor
 .globalzp OtherActor
@@ -58,3 +63,17 @@ OAM_XPOS = OAM+0
 OAM_YPOS = OAM+1
 OAM_TILE = OAM+2
 OAM_ATTR = OAM+3
+
+.global LevelMap
+
+.global ColumnUpdateAddress
+.global ColumnUpdateBuffer
+.global RowUpdateAddress
+.global RowUpdateBuffer
+
+BLOCK_UPDATE_COUNT = 8
+.global BlockUpdateAddress
+.global BlockUpdateDataTL
+.global BlockUpdateDataTR
+.global BlockUpdateDataBL
+.global BlockUpdateDataBR

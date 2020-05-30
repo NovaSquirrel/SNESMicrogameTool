@@ -18,7 +18,8 @@ version = 0.01
 objlist = \
   snesheader init main bg player primitives \
   ppuclear blarggapu spcimage musicseq memory \
-  math sincos_data runmicrogame games/example/microgame
+  math sincos_data runmicrogame games/example/microgame \
+  renderlevel
 objlistspc = \
   spcheader spcimage musicseq
 brrlist = \

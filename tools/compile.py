@@ -529,6 +529,7 @@ def compile_microgame(game, output, name, maps):
 	outfile.write('.addr %s_MapList\n' % gamename)
 	outfile.write('.addr %s_ActorRun\n' % gamename)
 	outfile.write('.addr %s_ActorInit\n' % gamename)
+	outfile.write('.word %d\n' % (32*len(maps.map_chr)))
 	outfile.write('.endproc\n\n')
 
 	# actor type list
@@ -539,6 +540,7 @@ def compile_microgame(game, output, name, maps):
 
 	outfile.write('.proc %s_PalData\n' % gamename)
 	for pal in maps.map_palettes:
+		outfile.write('  .word 0\n') # dummy
 		outfile.write('  .word %s\n' % (', '.join(['RGB8(%d,%d,%d)' % x for x in pal])))
 	outfile.write('.endproc\n%s_EndPalData:\n\n' % gamename)
 
@@ -592,15 +594,20 @@ def compile_microgame(game, output, name, maps):
 	# and the map data
 	for map in maps.maps:
 		outfile.write('.proc %s_MapData_%s\n' % (gamename, map.name))
+		outfile.write('.word RGB8(%d,%d,%d)\n' % (map.bgcolor[0], map.bgcolor[1], map.bgcolor[2]))
 		outfile.write('.addr Actors\n')
 		outfile.write('.byt %d, %d\n' % (map.map_width, map.map_height))
 
-		for row in map.map_data:
-			outfile.write('.byt %s\n' % (','.join([str(all_blocks.index(x)) for x in row])))
+		#for row in map.map_data:
+		#	outfile.write('.byt %s\n' % (','.join([str(all_blocks.index(x)) for x in row])))
+
+		# Write column by column instead
+		for x in range(map.map_width):
+			outfile.write('.byt %s\n' % (','.join([str(all_blocks.index(map.map_data[y][x])) for y in range(map.map_height)])))
 
 		outfile.write('Actors:\n')
 		for a in map.actor_list:
-			outfile.write('.byt %s_ActorType::%s, <%d, >%d, <%d, >%d, %d\n' % (gamename, a[0], a[1], a[1], a[2], a[2], a[3]))
+			outfile.write('.byt %s_ActorType::%s, <%d, >%d, <%d, >%d, %d\n' % (gamename, a[0], a[1]*16, a[1]*16, a[2]*16, a[2]*16, a[3]))
 		outfile.write('.byt 255\n')
 
 		outfile.write('.endproc\n\n')

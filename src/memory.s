@@ -29,6 +29,12 @@
   retraces: .res 2
   OamPtr: .res 2
   seed: .res 4
+  ScrollX: .res 2
+  ScrollY: .res 2
+  TempVal: .res 4
+
+  DecodePointer: .res 3
+  LevelBlockPtr: .res 3
 
   MicrogameTime:       .res 2 ; Game frames
   MicrogameRealFrames: .res 2 ; Used to determine when to run everything twice
@@ -46,6 +52,9 @@
 
   ThisActor:  .res 2 ; current actor
   OtherActor: .res 2 ; the other actor
+
+  MapWidth:  .res 1
+  MapHeight: .res 1
 
   ; Pointers for the current game's data
   GameDataPointer: .res 3
@@ -82,7 +91,19 @@
   OAM:   .res 512
   OAMHI: .res 512
 
+  ColumnUpdateAddress: .res 2     ; Address to upload to, or zero for none
+  ColumnUpdateBuffer:  .res 32*2  ; 32 tiles vertically
+  RowUpdateAddress:    .res 2     ; Address to upload to, or zero for none
+  RowUpdateBuffer:     .res 64*2  ; 64 tiles horizontally
+
+  BlockUpdateAddress:  .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateDataTL:   .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateDataTR:   .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateDataBL:   .res BLOCK_UPDATE_COUNT*2
+  BlockUpdateDataBR:   .res BLOCK_UPDATE_COUNT*2
+
+
 .segment "BSS7E"
 
 .segment "BSS7F"
-
+LevelMap: .res 16384 ; 128*128

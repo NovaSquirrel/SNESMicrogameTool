@@ -24,3 +24,4 @@ auto_linker.cfg
 Mesen-S.exe
 src/sincos_data.s
 *.sfc
+src/games/*.s
