@@ -52,7 +52,7 @@ USE_AUDIO = 1
   ; designed to receive data from the main CPU through communication
   ; ports at $2140-$2143.  Load a program and start it running.
   .if ::USE_AUDIO
-    jsl spc_boot_apu
+;    jsl spc_boot_apu
   .endif
 
   .import StartMicrogame
@@ -170,4 +170,45 @@ padwait:
 .endproc
 
 
+
+; Quickly clears a section of WRAM
+; Inputs: X (address), Y (size)
+.i16
+.a16
+.export MemClear
+.proc MemClear
+  php
+  seta8
+  stz WMADDH ; high bit of WRAM address
+UseHighHalf:
+  stx WMADDL ; WRAM address, bottom 16 bits
+  sty DMALEN
+
+  ldx #DMA_CONST|DMA_LINEAR|(<WMDATA << 8)
+ZeroSource:
+  stx DMAMODE
+
+  ldx #.loword(ZeroSource+1)
+  stx DMAADDR
+  lda #^MemClear
+  sta DMAADDRBANK
+
+  lda #$01
+  sta COPYSTART
+  plp
+  rtl
+.endproc
+
+; Quickly clears a section of the second 64KB of RAM
+; Inputs: X (address), Y (size)
+.i16
+.a16
+.export MemClear7F
+.proc MemClear7F
+  php
+  seta8
+  lda #1
+  sta WMADDH
+  bra MemClear::UseHighHalf
+.endproc
 
