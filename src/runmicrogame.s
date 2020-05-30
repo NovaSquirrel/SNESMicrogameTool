@@ -89,6 +89,12 @@
   sta COPYSTART
 
 
+  setxy16
+  ldx #0
+  ldy #128*128
+  .import MemClear7F
+  jsl MemClear7F
+
   ; Load map zero
   lda #0
   jsr LoadMicrogameMap

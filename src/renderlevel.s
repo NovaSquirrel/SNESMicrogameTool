@@ -28,7 +28,8 @@ ForegroundBG = $c000
 .proc RenderLevelScreens
   setaxy16
   stz ScrollX
-  stz ScrollY
+  lda #256
+  sta ScrollY
 
   ; -------------------
 
