@@ -26,7 +26,7 @@
 
   ; Load in the pointers
   seta16
-  ldy #5
+  ldy #3*2
   lda [GameDataPointer],y
   sta GameDataPointer_BlockUL
   iny
@@ -45,7 +45,7 @@
   iny
   lda [GameDataPointer],y
   sta GameDataPointer_BlockFlags
-  ldy #16+1
+  ldy #9*2
   lda [GameDataPointer],y
   sta GameDataPointer_ActorRun
   iny
@@ -60,7 +60,7 @@
   sta DMAMODE
   lda [GameDataPointer]
   sta DMAADDR
-  lda #16*2
+  lda #16*2*16
   sta DMALEN
   seta8
   lda GameDataPointer+2
@@ -69,24 +69,43 @@
   lda #1
   sta COPYSTART
 
-  ; CHR
+  ; Background CHR
   seta16
   lda #DMAMODE_PPUDATA
   sta DMAMODE
-  ldy #10*2+1
+  ldy #11*2
   lda [GameDataPointer],y
   sta DMALEN
-  ldy #2+1
+  ldy #2*2
   lda [GameDataPointer],y
   sta DMAADDR
   seta8
-  ldy #2
+  ldy #1*2+0
   lda [GameDataPointer],y
   sta DMAADDRBANK
-  stz PPUADDR
-  stz PPUADDR
+  stz PPUADDR+0
+  stz PPUADDR+1
   lda #1
   sta COPYSTART
+
+  ; Sprite CHR
+  seta16
+  ldy #12*2
+  lda [GameDataPointer],y
+  sta DMALEN
+  ldy #13*2
+  lda [GameDataPointer],y
+  sta DMAADDR
+  seta8
+  ldy #1*2+1
+  lda [GameDataPointer],y
+  sta DMAADDRBANK
+  stz PPUADDR+0
+  lda #$80>>1
+  sta PPUADDR+1
+  lda #1
+  sta COPYSTART
+
 
 
   setxy16
@@ -115,7 +134,7 @@ RowsLeft = 7
   sta Pointer+2
 
   seta16
-  ldy #7*2+1 ; Map list
+  ldy #8*2 ; Map list
   lda [GameDataPointer],y
   sta Pointer
 

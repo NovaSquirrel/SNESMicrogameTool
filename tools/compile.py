@@ -489,7 +489,7 @@ def compile_routine(name, block):
 	compile_block(block)
 	outfile.write('Exit:\nrts\n.endproc\n\n')
 
-def compile_microgame(game, output, name, maps):
+def compile_microgame(game, output, name, maps, animations):
 	""" Compile the whole microgame """
 	global outfile, gamename
 
@@ -505,12 +505,45 @@ def compile_microgame(game, output, name, maps):
 	outfile.write('.i16\n')
 	outfile.write('.export %s_GameData\n\n' % gamename)
 
+	# write background CHR
 	outfile.write('.segment "GameChr_%s"\n\n' % gamename)
-	# chr data
 	outfile.write('.proc %s_ChrData\n' % gamename)
 	for tile in maps.map_chr:
 		outfile.write('  .byt %s\n' % (', '.join(['$%.2X' % x for x in tile])))
 	outfile.write('.endproc\n%s_EndChrData:\n\n' % gamename)
+
+	# write *sprite* CHR, which must be arranged correctly
+	sprite_chr = [[]]*512 # 512 slots for tiles
+	# place 16x16 chr first
+	for i in range(len(animations.chr16)):
+		y = (i//8) * 2
+		x = (i%8) * 2
+		t = y*32+x
+		chr = animations.chr16[i]
+		sprite_chr[t]    = chr[0]
+		sprite_chr[t+1]  = chr[1]
+		sprite_chr[t+16] = chr[2]
+		sprite_chr[t+17] = chr[3]
+	# place 8x8 next
+	tilenumber_for_8 = [] # keep track of what tile number was used here
+	for i in range(len(animations.chr8)):
+		free = tilenumber_for_8.index([])
+		sprite_chr[free] = animations.chr8[i]
+		tilenumber_for_8.append(free)
+	# trim empty space
+	while sprite_chr[-1] == []:
+		sprite_chr.pop()
+
+	# actually write sprite CHR
+	outfile.write('.segment "GameSpriteChr_%s"\n\n' % gamename)
+	outfile.write('.proc %s_SpriteChrData\n' % gamename)
+	for tile in sprite_chr:
+		if tile == []:
+			outfile.write('  .byt %s\n' % (', '.join(['0']*32)))
+		else:
+			outfile.write('  .byt %s\n' % (', '.join(['$%.2X' % x for x in tile])))
+	outfile.write('.endproc\n%s_EndSpriteChrData:\n\n' % gamename)
+
 
 	outfile.write('.segment "BSS"\n\n')
 	for v in game['variables']:
@@ -519,7 +552,7 @@ def compile_microgame(game, output, name, maps):
 	outfile.write('.segment "GameData_%s"\n\n' % gamename)
 	outfile.write('.proc %s_GameData\n' % gamename)
 	outfile.write('.addr %s_PalData\n' % gamename)
-	outfile.write('.byt ^%s_ChrData\n' % gamename)
+	outfile.write('.byt ^%s_ChrData, ^%s_SpriteChrData\n' % (gamename, gamename))
 	outfile.write('.addr %s_ChrData\n' % gamename)
 	outfile.write('.addr %s_BlockTopLeft\n' % gamename)
 	outfile.write('.addr %s_BlockTopRight\n' % gamename)
@@ -530,6 +563,8 @@ def compile_microgame(game, output, name, maps):
 	outfile.write('.addr %s_ActorRun\n' % gamename)
 	outfile.write('.addr %s_ActorInit\n' % gamename)
 	outfile.write('.word %d\n' % (32*len(maps.map_chr)))
+	outfile.write('.word %d\n' % (32*len(sprite_chr)))
+	outfile.write('.addr %s_SpriteChrData\n' % gamename)
 	outfile.write('.endproc\n\n')
 
 	# actor type list
@@ -540,6 +575,12 @@ def compile_microgame(game, output, name, maps):
 
 	outfile.write('.proc %s_PalData\n' % gamename)
 	for pal in maps.map_palettes:
+		outfile.write('  .word 0\n') # dummy
+		outfile.write('  .word %s\n' % (', '.join(['RGB8(%d,%d,%d)' % x for x in pal])))
+	for i in range(8-len(maps.map_palettes)):
+		outfile.write('  .word 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ; dummy\n')
+	for pal in animations.palettes:
+		print(pal)
 		outfile.write('  .word 0\n') # dummy
 		outfile.write('  .word %s\n' % (', '.join(['RGB8(%d,%d,%d)' % x for x in pal])))
 	outfile.write('.endproc\n%s_EndPalData:\n\n' % gamename)

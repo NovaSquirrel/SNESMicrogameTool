@@ -3,8 +3,15 @@
     <variable id="twlKznGMd|v3Ti|mP_+8">coins</variable>
     <variable id="2wj4#dvfoy!?mzd!{i1t">has_key</variable>
   </variables>
-  <block type="actor" id="0bjP)UuMl,K/|$l7s^u#" x="61" y="116">
+  <block type="actor" id="0bjP)UuMl,K/|$l7s^u#" x="59" y="62">
     <field name="NAME">ball</field>
+    <statement name="INIT">
+      <block type="animation" id="w:Y,k17b@Hp0.5byN8/I">
+        <field name="NAME">blueball</field>
+        <field name="XFLIP">FALSE</field>
+        <field name="YFLIP">FALSE</field>
+      </block>
+    </statement>
     <statement name="RUN">
       <block type="apply_gravity" id="?(x#?PsnI$[2kf3AQ7;1">
         <field name="COLLIDE">TRUE</field>
@@ -54,6 +61,13 @@
         <next>
           <block type="scroll_follow_actor" id="BVVHajzss:(lFS/BIswF">
             <field name="SLOW">DIV1</field>
+            <next>
+              <block type="animation" id="tsPX.pA%s^?)r#4)K9z9">
+                <field name="NAME">smiley</field>
+                <field name="XFLIP">FALSE</field>
+                <field name="YFLIP">FALSE</field>
+              </block>
+            </next>
           </block>
         </next>
       </block>
@@ -233,9 +247,23 @@
   </block>
   <block type="actor" id="u*O[LN^?1Wg!;5M9{?2G" x="1138" y="271">
     <field name="NAME">bread</field>
+    <statement name="INIT">
+      <block type="animation" id="tsAUnN{KDESn^.=^J8P2">
+        <field name="NAME">bread</field>
+        <field name="XFLIP">FALSE</field>
+        <field name="YFLIP">FALSE</field>
+      </block>
+    </statement>
   </block>
-  <block type="actor" id="+hj%Tuw^=2bh/Y,-|}=E" x="64" y="370">
+  <block type="actor" id="+hj%Tuw^=2bh/Y,-|}=E" x="60" y="344">
     <field name="NAME">youmarker</field>
+    <statement name="INIT">
+      <block type="animation" id="@$/=3h9w]+2x1Xi%QMGf">
+        <field name="NAME">youmarker</field>
+        <field name="XFLIP">FALSE</field>
+        <field name="YFLIP">FALSE</field>
+      </block>
+    </statement>
     <statement name="RUN">
       <block type="set_math" id=".8b-zkaf,rWVI#:%x8M+">
         <field name="OPERATION">ADD</field>
@@ -331,35 +359,42 @@
   <block type="actor" id="M-.|=EIY7P%3c=,~aBBm" x="51" y="696">
     <field name="NAME">burger</field>
     <statement name="INIT">
-      <block type="set_math" id="+%5Q#B24AH;rkvC~Kygg">
-        <field name="OPERATION">RANDOM</field>
-        <value name="VARIABLE">
-          <block type="property" id="$F.4}?yc3}5sx`fI|MpL">
-            <field name="NAME">DIRECTION</field>
-          </block>
-        </value>
-        <value name="LEFT">
-          <block type="math_number" id="i/e}_L|l(x^-OQ(T_~j-">
-            <field name="NUM">0</field>
-          </block>
-        </value>
-        <value name="RIGHT">
-          <block type="math_number" id="S{E4sebSkd`/WI,z_ts5">
-            <field name="NUM">255</field>
-          </block>
-        </value>
+      <block type="animation" id="NP;Eu1keoD|jX.DIdi)$">
+        <field name="NAME">burger</field>
+        <field name="XFLIP">FALSE</field>
+        <field name="YFLIP">FALSE</field>
         <next>
-          <block type="set_nomath" id="(a14,~euHjS6[E;/x30+">
+          <block type="set_math" id="+%5Q#B24AH;rkvC~Kygg">
+            <field name="OPERATION">RANDOM</field>
+            <value name="VARIABLE">
+              <block type="property" id="$F.4}?yc3}5sx`fI|MpL">
+                <field name="NAME">DIRECTION</field>
+              </block>
+            </value>
             <value name="LEFT">
-              <block type="property" id="N|CQi[l4z8R`Q*8o{):M">
-                <field name="NAME">SPEED</field>
+              <block type="math_number" id="i/e}_L|l(x^-OQ(T_~j-">
+                <field name="NUM">0</field>
               </block>
             </value>
             <value name="RIGHT">
-              <block type="coordinate_pixels" id="xpA9GIu2fnO=`0j{G^9c">
-                <field name="NUM">2</field>
+              <block type="math_number" id="S{E4sebSkd`/WI,z_ts5">
+                <field name="NUM">255</field>
               </block>
             </value>
+            <next>
+              <block type="set_nomath" id="(a14,~euHjS6[E;/x30+">
+                <value name="LEFT">
+                  <block type="property" id="N|CQi[l4z8R`Q*8o{):M">
+                    <field name="NAME">SPEED</field>
+                  </block>
+                </value>
+                <value name="RIGHT">
+                  <block type="coordinate_pixels" id="xpA9GIu2fnO=`0j{G^9c">
+                    <field name="NUM">2</field>
+                  </block>
+                </value>
+              </block>
+            </next>
           </block>
         </next>
       </block>

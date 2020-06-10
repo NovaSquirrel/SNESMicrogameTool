@@ -22,7 +22,7 @@
 from compile import *
 from translate import *
 from readtiled import *
-
+import glob
 
 def make_game(game_name):
 	game_directory = 'src/games/%s/' % game_name
@@ -31,7 +31,8 @@ def make_game(game_name):
 #	import json
 #	print(json.dumps(info, indent=2))
 
+	animations = AnimationSet(game_directory, info['animations'])
 	maps = TiledMapSet(game_directory, ['map.tmx'])
-	compile_microgame(info, game_directory+'microgame.s', game_name, maps)
+	compile_microgame(info, game_directory+'microgame.s', game_name, maps, animations)
 
 make_game('example')

@@ -22,8 +22,6 @@
 import xml.etree.ElementTree as ET # phone home
 import sys
 
-variable_names = set()
-
 def strip_namespace(tag):
 	# change "{whatever}tag" to "tag"
 	find = tag.find('}')
@@ -255,12 +253,14 @@ def blk_set_math(block):
 
 blocks['set_math'] = blk_set_math
 
+all_animations = set()
 def blk_animation(block):
 	flips = 0
 	if block.field['XFLIP'] == 'TRUE':
 		flips |= 64
 	if block.field['YFLIP'] == 'TRUE':
 		flips |= 128
+	all_animations.add(block.field['NAME'])
 	return ['animation', '%s|%d' % (block.field['NAME'], flips)]	
 blocks['animation'] = blk_animation
 
@@ -484,6 +484,7 @@ def translate_routine(routine):
 	return out
 
 def translate_xml(filename):
+	all_animations.clear()
 	tree = ET.parse(filename)
 	root = tree.getroot()
 
@@ -517,4 +518,5 @@ def translate_xml(filename):
 			out['game']['length'] = 8 if (block.field['LONG'] == 'TRUE') else 4
 		else:
 			print("Unexpected block? "+block.type)
+	out['animations'] = list(all_animations)
 	return out
