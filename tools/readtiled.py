@@ -385,7 +385,7 @@ class AnimationSet():
 		# Only include the used animations
 		for anim in used_animations:
 			# Output with the animation information
-			out = {'size': sheet.tilewidth, 'pal': palette_for_name[anim]}
+			out = {'size': sheet.tilewidth, 'palette': palette_for_name[anim]}
 
 			sheet = self.sheet_for_name[anim]
 			assert sheet.tilewidth == sheet.tileheight

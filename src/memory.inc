@@ -55,6 +55,7 @@ ActorLen = 20
 .globalzp GameDataPointer_BlockFlags
 .globalzp GameDataPointer_ActorRun
 .globalzp GameDataPointer_ActorInit
+.globalzp GameDataPointer_Animations
 
 
 .global OAM

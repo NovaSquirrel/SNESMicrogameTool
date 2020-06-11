@@ -27,7 +27,7 @@ brrlist = \
 
 AS65 := ca65
 LD65 := ld65
-CFLAGS65 = 
+CFLAGS65 = -g
 objdir := obj/snes
 srcdir := src
 imgdir := tilesets

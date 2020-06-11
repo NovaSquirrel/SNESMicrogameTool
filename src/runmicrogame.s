@@ -23,6 +23,7 @@
   sta GameDataPointer_BlockFlags+2
   sta GameDataPointer_ActorInit+2
   sta GameDataPointer_ActorRun+2
+  sta GameDataPointer_Animations+2
 
   ; Load in the pointers
   seta16
@@ -52,8 +53,9 @@
   iny
   lda [GameDataPointer],y
   sta GameDataPointer_ActorInit
-
-
+  ldy #14*2
+  lda [GameDataPointer],y
+  sta GameDataPointer_Animations
 
   ; Palettes
   lda #DMAMODE_CGDATA
@@ -106,8 +108,7 @@
   lda #1
   sta COPYSTART
 
-
-
+  ; Clear the map
   setxy16
   ldx #0
   ldy #128*128
@@ -219,6 +220,7 @@ Loop:
   sta Pointer
 
   ldx #ActorStart
+  ldy #0
   .import CallActorInit
 ActorLoop:
   lda [Pointer],y
@@ -244,7 +246,7 @@ ActorLoop:
 
   phy
   stx ThisActor
-;  jsl CallActorInit
+  jsl CallActorInit
   ply
 
   txa
@@ -271,10 +273,10 @@ LastActor:
   sta NTADDR+2   ; plane 2 nametable at $e000, 1 screen
 
   stz PPURES
-  lda #%00000011  ; enable plane 0 and 1
+  lda #%00010011  ; enable plane 0 and 1 and sprites
   sta BLENDMAIN
   stz BLENDSUB
-  lda #VBLANK_NMI|AUTOREAD  ; but disable htime/vtime IRQ
+  lda #VBLANK_NMI|AUTOREAD
   sta PPUNMI
   stz CGWSEL
   stz CGADSUB
@@ -292,12 +294,23 @@ LastActor:
 .endproc
 
 .proc MicrogameLoop
+  seta8
+  lda #VBLANK_NMI|AUTOREAD
+  sta PPUNMI
+  seta16
+  ldx #0
+  jsl ppu_clear_oam
+  jsl ppu_pack_oamhi
+
 Loop:
   jsl WaitVblank
   seta8
   lda #15
   sta PPUBRIGHT
 
+  jsl ppu_copy_oam
+
+  seta8
   lda #$01
 padwait:
   bit VBLSTATUS
@@ -340,9 +353,78 @@ padwait:
   and keydown
   sta keynew
 
+  ; Game logic --------------------------------------------
+  stz OamPtr
 
+  jsr RunActors
+  jsr DrawActors
+
+  ldx OamPtr
+  jsl ppu_clear_oam
+  jsl ppu_pack_oamhi
 
   jmp Loop
+.endproc
+
+.proc RunActors
+  ldx #ActorStart
+Loop:
+  lda ActorType,x
+  beq Skip
+  stx ThisActor
+  asl ; * 2
+  tay
+  lda [GameDataPointer_ActorRun],y
+  beq Skip
+  sta 0
+  jsl Call
+
+Skip:
+  txa
+  add #ActorSize
+  tax
+  cpx #ActorEnd
+  bne Loop
+  rts
+
+Call:
+  wdm 0
+  seta8
+  lda GameDataPointer+2
+  pha
+  plb
+  sta 2
+  seta16
+  jml [0]
+.endproc
+
+.proc DrawActors
+  ldx #ActorStart
+Loop:
+  lda ActorType,x
+  beq Skip
+
+  lda ActorArt,x
+  asl ; * 2
+  asl ; * 4
+  tay
+  lda [GameDataPointer_Animations],y
+  cmp #16
+  bne Not16
+    iny
+    iny
+    lda [GameDataPointer_Animations],y
+    jsr DispActor16x16
+  Not16:
+
+Skip:
+  txa
+  add #ActorSize
+  tax
+  cpx #ActorEnd
+  bne Loop
+
+  rts
 .endproc
 
 .proc WaitVblank
@@ -357,4 +439,81 @@ loop2:
   bpl loop2
   plp
   rtl
+.endproc
+
+
+; Calculate the position of the Actor on-screen
+; and whether it's visible in the first place
+.a16
+.proc ActorDrawPosition
+  lda ActorPX,x
+  sub ScrollX
+  cmp #.loword(-1*256)
+  bcs :+
+  cmp #16*256
+  bcs Invalid
+: jsr Shift
+  sub #8
+  sta 0
+
+  lda ActorPY,x
+  sub ScrollY
+  ; TODO: properly allow sprites to be partially offscreen on the top
+;  cmp #.loword(-1*256)
+;  bcs :+
+  cmp #15*256
+  bcs Invalid
+  jsr Shift
+  sub #8
+  sta 2
+
+  sec
+  rts
+Invalid:
+  clc
+  rts
+
+Shift:
+  eor #.loword(-$8000)
+  lsr
+  lsr
+  lsr
+  lsr
+  add #.loword(-($8000 >> 4))
+  rts
+.endproc
+
+.a16
+.export DispActor16x16
+.proc DispActor16x16
+  sta 4
+
+  ldy OamPtr
+
+  jsr ActorDrawPosition
+  bcs :+
+    rts
+  :  
+
+  lda 4
+  sta OAM_TILE,y ; 16-bit, combined with attribute
+
+  seta8
+  lda 0
+  sta OAM_XPOS,y
+  lda 2
+  sta OAM_YPOS,y
+
+  ; Get the high bit of the calculated position and plug it in
+  lda 1
+  cmp #%00000001
+  lda #1 ; 16x16 sprites
+  rol
+  sta OAMHI+1,y
+  seta16
+
+  tya
+  add #4
+  sta OamPtr
+  rts
 .endproc

@@ -259,7 +259,7 @@ def cmd_animation(a):
 actions['animation'] = cmd_animation
 
 def cmd_call(a):
-	outfile.write('jsr %s_subroutine_%s\n' % (gamename, a[0]))
+	outfile.write('jsl %s_subroutine_%s\n' % (gamename, a[0]))
 actions['call'] = cmd_call
 
 def cmd_asm(a):
@@ -487,7 +487,7 @@ def compile_routine(name, block):
 	""" Makes a routine and the necessary stuff around it """
 	outfile.write('.proc %s\n' % name)
 	compile_block(block)
-	outfile.write('Exit:\nrts\n.endproc\n\n')
+	outfile.write('Exit:\nrtl\n.endproc\n\n')
 
 def compile_microgame(game, output, name, maps, animations):
 	""" Compile the whole microgame """
@@ -565,6 +565,7 @@ def compile_microgame(game, output, name, maps, animations):
 	outfile.write('.word %d\n' % (32*len(maps.map_chr)))
 	outfile.write('.word %d\n' % (32*len(sprite_chr)))
 	outfile.write('.addr %s_SpriteChrData\n' % gamename)
+	outfile.write('.addr %s_AnimationInfo\n' % gamename)
 	outfile.write('.endproc\n\n')
 
 	# actor type list
@@ -573,6 +574,22 @@ def compile_microgame(game, output, name, maps, animations):
 		outfile.write(name+'\n')
 	outfile.write('.endenum\n\n')
 
+	# animation
+	outfile.write('.enum %s_Animation\n' % gamename)
+	for name in animations.animations:
+		outfile.write(name+'\n')
+	outfile.write('.endenum\n\n')
+
+	outfile.write('.proc %s_AnimationInfo\n' % gamename)
+	for name, a in animations.animations.items():
+		outfile.write("  ; %s\n" % name)
+		outfile.write("  .byt %d,0\n" % a['size'])
+		if a['size'] == 8:
+			outfile.write("  .word %d|(%d<<9)\n" % (tilenumber_for_8[a['frames'][0]], a['palette']))
+		else:
+			outfile.write("  .word (%d)+(%d)+(%d<<9)\n" % (a['frames'][0]%8*2, a['frames'][0]//8*32, a['palette']))
+	outfile.write('.endproc\n\n')
+
 	outfile.write('.proc %s_PalData\n' % gamename)
 	for pal in maps.map_palettes:
 		outfile.write('  .word 0\n') # dummy
@@ -580,7 +597,6 @@ def compile_microgame(game, output, name, maps, animations):
 	for i in range(8-len(maps.map_palettes)):
 		outfile.write('  .word 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ; dummy\n')
 	for pal in animations.palettes:
-		print(pal)
 		outfile.write('  .word 0\n') # dummy
 		outfile.write('  .word %s\n' % (', '.join(['RGB8(%d,%d,%d)' % x for x in pal])))
 	outfile.write('.endproc\n%s_EndPalData:\n\n' % gamename)

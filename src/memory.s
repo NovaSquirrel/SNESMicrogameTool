@@ -65,6 +65,7 @@
   GameDataPointer_BlockFlags: .res 3
   GameDataPointer_ActorRun:   .res 3
   GameDataPointer_ActorInit:  .res 3
+  GameDataPointer_Animations: .res 3
 
 .segment "BSS"
   ActorSize = 15*2

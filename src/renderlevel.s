@@ -27,7 +27,9 @@ ForegroundBG = $c000
 .export RenderLevelScreens
 .proc RenderLevelScreens
   setaxy16
-  stz ScrollX
+  lda #256*15
+  sta ScrollX
+
   lda #256
   sta ScrollY
 
@@ -53,7 +55,6 @@ YPos = 4
 
 Loop:
   lda LevelBlockPtr
-  wdm 0
 
   ; Calculate the column address
   lda BlockNum

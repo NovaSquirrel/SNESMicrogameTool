@@ -47,7 +47,7 @@
   asl
   tay
   lda ActorSpeed,x
-  jsr SpeedAngle2Offset256 ; A = speed, Y = angle -> 0,1,2(X) 2,3,4(Y)
+  jsl SpeedAngle2Offset256 ; A = speed, Y = angle -> 0,1,2(X) 2,3,4(Y)
   lda 1
   sta ActorVX,x
   lda 3
@@ -177,7 +177,9 @@ Fail:
   sta 2
   seta16
 
-  ldy ActorType,x
+  lda ActorType,x
+  asl
+  tay
   lda [GameDataPointer_ActorInit],y
   bne :+
     rtl
