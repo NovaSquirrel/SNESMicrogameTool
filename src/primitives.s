@@ -49,8 +49,10 @@
   lda ActorSpeed,x
   jsl SpeedAngle2Offset256 ; A = speed, Y = angle -> 0,1,2(X) 2,3,4(Y)
   lda 1
+  asr_n 2
   sta ActorVX,x
-  lda 3
+  lda 4
+  asr_n 2
   sta ActorVY,x
   jmp ActorApplyVelocity
 .endproc
@@ -452,8 +454,13 @@ No:
 .import MathSinTable, MathCosTable
 .proc SpeedAngle2Offset256
   php
+  phb
   seta8
   sta M7MUL ; 8-bit factor
+
+  lda #^MathCosTable
+  pha
+  plb
 
   lda MathCosTable+0,y
   sta M7MCAND ; 16-bit factor
@@ -480,6 +487,7 @@ No:
   sta 4
   lda M7PRODBANK
   sta 5
+  plb
   plp
   rtl
 .endproc

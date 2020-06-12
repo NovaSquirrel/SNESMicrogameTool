@@ -388,7 +388,6 @@ Skip:
   rts
 
 Call:
-  wdm 0
   seta8
   lda GameDataPointer+2
   pha
