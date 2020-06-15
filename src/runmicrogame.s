@@ -1,3 +1,23 @@
+;
+; SNES Microgame engine
+; Copyright 2020 NovaSquirrel
+; 
+; This software is provided 'as-is', without any express or implied
+; warranty.  In no event will the authors be held liable for any damages
+; arising from the use of this software.
+; 
+; Permission is granted to anyone to use this software for any purpose,
+; including commercial applications, and to alter it and redistribute it
+; freely, subject to the following restrictions:
+; 
+; 1. The origin of this software must not be misrepresented; you must not
+;    claim that you wrote the original software. If you use this software
+;    in a product, an acknowledgment in the product documentation would be
+;    appreciated but is not required.
+; 2. Altered source versions must be plainly marked as such, and must not be
+;    misrepresented as being the original software.
+; 3. This notice may not be removed or altered from any source distribution.
+;
 .include "snes.inc"
 .include "global.inc"
 .include "memory.inc"
@@ -148,6 +168,9 @@ RowsLeft = 7
   sta Pointer
 
   seta8
+  lda #1
+  sta GameInitPhase
+
   ; Background color
   stz CGADDR
   lda [Pointer]
@@ -280,6 +303,8 @@ LastActor:
   sta PPUNMI
   stz CGWSEL
   stz CGADSUB
+  stz GameInitPhase
+
 
   ; Render the screen
   lda #$7f
@@ -302,14 +327,37 @@ LastActor:
   jsl ppu_clear_oam
   jsl ppu_pack_oamhi
 
-Loop:
+Forever:
   jsl WaitVblank
+  ; -------------------------------------------------------
+  ; Do vblank things!
+  ; -------------------------------------------------------
   seta8
   lda #15
   sta PPUBRIGHT
-
   jsl ppu_copy_oam
 
+  ; -------------------------------------------------------
+  ; Do screen updates
+  ; -------------------------------------------------------
+
+  ; Do row/column updates if required
+  lda ColumnUpdateAddress
+  beq :+
+    .import RenderLevelColumnUpload
+    jsl RenderLevelColumnUpload
+    stz ColumnUpdateAddress
+  :
+  lda RowUpdateAddress
+  beq :+
+    .import RenderLevelRowUpload
+    jsl RenderLevelRowUpload
+    stz RowUpdateAddress
+  :
+
+  ; -------------------------------------------------------
+  ; Wait for the controller information to be ready
+  ; -------------------------------------------------------
   seta8
   lda #$01
 padwait:
@@ -353,17 +401,29 @@ padwait:
   and keydown
   sta keynew
 
-  ; Game logic --------------------------------------------
+  ; -------------------------------------------------------
+  ; Game logic
+  ; -------------------------------------------------------
   stz OamPtr
 
+  lda ScrollX
+  sta OldScrollX
+  lda ScrollY
+  sta OldScrollY
   jsr RunActors
   jsr DrawActors
+  .import UpdateScrolling
+  jsr UpdateScrolling
+
+  ; -------------------------------------------------------
+  ; Prepare OAM for upload
+  ; -------------------------------------------------------
 
   ldx OamPtr
   jsl ppu_clear_oam
   jsl ppu_pack_oamhi
 
-  jmp Loop
+  jmp Forever
 .endproc
 
 .proc RunActors
@@ -495,6 +555,7 @@ Shift:
   :  
 
   lda 4
+  ora #OAM_PRIORITY_2
   sta OAM_TILE,y ; 16-bit, combined with attribute
 
   seta8

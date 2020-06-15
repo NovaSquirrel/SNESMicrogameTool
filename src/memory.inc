@@ -9,6 +9,8 @@
 .globalzp MicrogameFrames
 .globalzp DecodePointer, LevelBlockPtr
 .globalzp ScrollX, ScrollY, TempVal
+.global OldScrollX, OldScrollY
+.global GameInitPhase
 
 .globalzp MicrogameDifficulty
 .globalzp MicrogameWon

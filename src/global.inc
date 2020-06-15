@@ -49,8 +49,17 @@
 .global BlockTargetCoordinate
 .global BlockTargetActorXY
 .global BlockChangeType
+.global ScrollCenterActor
+.global ScrollFollowActor2
+.global ScrollFollowActor4
+.global ScrollFollowActor8
 
 .global RandomChance
 .global ActorInRegion
 .global ActorTouchingType
 .global ActorOverlapBlock
+
+LEVEL_HEIGHT = 128
+LEVEL_WIDTH  = 128
+LEVEL_TILE_SIZE = 1
+ForegroundBG = $c000

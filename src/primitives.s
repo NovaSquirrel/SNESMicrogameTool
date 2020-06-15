@@ -537,6 +537,7 @@ No:
   plx
   rtl
 .endproc
+.a16
 
 .export ActorFall
 .proc ActorFall
@@ -551,4 +552,123 @@ No:
 .export BlockChangeType
 .proc BlockChangeType
   rtl
+.endproc
+
+
+.proc ScrollTargetActor
+TargetX = 0
+TargetY = 2
+  ; Find the target scroll positions
+  lda ActorPX,x
+  sub #8*256
+  bcs :+
+    lda #0
+: sta TargetX
+
+  lda ActorPY,x
+  sub #8*256  ; Pull back to center vertically
+  bcs :+
+    lda #0
+: cmp #(256+32)*16 ; Limit to two screens of vertical scrolling
+  bcc :+
+  lda #(256+32)*16
+: sta TargetY
+  rts
+.endproc
+
+.proc ScrollSpeedLimit
+  ; Take absolute value
+  php
+  bpl :+
+    eor #$ffff
+    inc a
+  :
+  ; Cap it at 8 pixels
+  cmp #$0080
+  bcc :+
+    lda #$0080
+  :
+  ; Undo absolute value
+  plp
+  bpl :+
+    eor #$ffff
+    inc a
+  :
+  rts
+.endproc
+
+.export ScrollCenterActor
+.proc ScrollCenterActor
+  jsr ScrollTargetActor
+  lda 0
+  sta ScrollX
+  lda 2
+  sta ScrollY
+  rtl
+.endproc
+
+.export ScrollFollowActor2
+.proc ScrollFollowActor2
+  jsr ScrollTargetActor
+
+  lda ScrollTargetActor::TargetX
+  sub ScrollX
+  jsr Shift
+  add ScrollX
+  sta ScrollX
+
+  lda ScrollTargetActor::TargetY
+  sub ScrollY
+  jsr Shift
+  add ScrollY
+  sta ScrollY
+  rtl
+
+Shift:
+  asr_n 1
+  jmp ScrollSpeedLimit
+.endproc
+
+.export ScrollFollowActor4
+.proc ScrollFollowActor4
+  jsr ScrollTargetActor
+
+  lda ScrollTargetActor::TargetX
+  sub ScrollX
+  jsr Shift
+  add ScrollX
+  sta ScrollX
+
+  lda ScrollTargetActor::TargetY
+  sub ScrollY
+  jsr Shift
+  add ScrollY
+  sta ScrollY
+  rtl
+
+Shift:
+  asr_n 2
+  jmp ScrollSpeedLimit
+.endproc
+
+.export ScrollFollowActor8
+.proc ScrollFollowActor8
+  jsr ScrollTargetActor
+
+  lda ScrollTargetActor::TargetX
+  sub ScrollX
+  jsr Shift
+  add ScrollX
+  sta ScrollX
+
+  lda ScrollTargetActor::TargetX
+  sub ScrollX
+  jsr Shift
+  add ScrollX
+  sta ScrollX
+  rtl
+
+Shift:
+  asr_n 3
+  jmp ScrollSpeedLimit
 .endproc

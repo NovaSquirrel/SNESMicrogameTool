@@ -239,19 +239,26 @@ actions['block-change-type'] = ('BlockChangeType', 1)
 actions[''] = ''
 
 def cmd_scroll_set(a):
-	pass
+	print("scroll set")
 actions['scroll-set'] = cmd_scroll_set
 
 def cmd_scroll_slide(a):
-	pass
+	print("scroll slide")
 actions['scroll-slide'] = cmd_scroll_slide
 
 def cmd_scroll_follow_actor(a):
-	pass
+	if a[0] == 0:
+		outfile.write('jsl ScrollCenterActor\n')
+	elif a[0] == 1:
+		outfile.write('jsl ScrollFollowActor2\n')
+	elif a[0] == 2:
+		outfile.write('jsl ScrollFollowActor4\n')
+	elif a[0] == 3:
+		outfile.write('jsl ScrollFollowActor8\n')
 actions['scroll-follow-actor'] = cmd_scroll_follow_actor
 
 def cmd_block_retarget_xy(a):
-	pass
+	print("block retarget")
 actions['block-retarget-xy'] = cmd_block_retarget_xy
 
 def cmd_animation(a):

@@ -1,3 +1,23 @@
+;
+; SNES Microgame engine
+; Copyright 2020 NovaSquirrel
+; 
+; This software is provided 'as-is', without any express or implied
+; warranty.  In no event will the authors be held liable for any damages
+; arising from the use of this software.
+; 
+; Permission is granted to anyone to use this software for any purpose,
+; including commercial applications, and to alter it and redistribute it
+; freely, subject to the following restrictions:
+; 
+; 1. The origin of this software must not be misrepresented; you must not
+;    claim that you wrote the original software. If you use this software
+;    in a product, an acknowledgment in the product documentation would be
+;    appreciated but is not required.
+; 2. Altered source versions must be plainly marked as such, and must not be
+;    misrepresented as being the original software.
+; 3. This notice may not be removed or altered from any source distribution.
+;
 .include "snes.inc"
 .include "global.inc"
 .include "memory.inc"
@@ -7,12 +27,7 @@
 
 .segment "CODE"
 
-LEVEL_HEIGHT = 128
-LEVEL_WIDTH  = 128
-LEVEL_TILE_SIZE = 1
-ForegroundBG = $c000
-
-
+.export GetLevelColumnPtr
 .proc GetLevelColumnPtr
 .a16
   and #255
@@ -50,7 +65,6 @@ YPos = 4
   lda ScrollY
   xba
   and #LEVEL_HEIGHT-1
-  asl
   sta YPos
 
 Loop:
@@ -95,6 +109,7 @@ Loop:
   rtl
 .endproc
 
+.export RenderLevelColumnUpload
 .proc RenderLevelColumnUpload
   php
   seta16
@@ -124,6 +139,7 @@ Loop:
   rtl
 .endproc
 
+.export RenderLevelRowUpload
 .proc RenderLevelRowUpload
   php
 
@@ -178,12 +194,10 @@ Loop:
 ; 16-bit accumulator and index
 .a16
 .i16
+.export RenderLevelColumnLeft
 .proc RenderLevelColumnLeft
-  phb
-  phk
-  plb
-
   tya
+  asl
   asl
   and #(32*2)-1
   tax
@@ -213,8 +227,6 @@ Loop:
   ; Stop after 32 tiles vertically
   cpx TempVal
   bne :-
-
-  plb
   rtl
 .endproc
 
@@ -223,12 +235,10 @@ Loop:
 ; 16-bit accumulator and index
 .a16
 .i16
+.export RenderLevelColumnRight
 .proc RenderLevelColumnRight
-  phb
-  phk
-  plb
-
   tya
+  asl
   asl
   and #(32*2)-1
   tax
@@ -258,8 +268,6 @@ Loop:
   ; Stop after 32 tiles vertically
   cpx TempVal
   bne :-
-
-  plb
   rtl
 .endproc
 
@@ -270,11 +278,8 @@ Loop:
 ; 16-bit accumulator and index
 .a16
 .i16
+.export RenderLevelRowTop
 .proc RenderLevelRowTop
-  phb
-  phk
-  plb
-
   lda #20
   sta TempVal
 
@@ -308,8 +313,6 @@ Loop:
   ; Stop after 64 tiles horizontally
   dec TempVal
   bne :-
-
-  plb
   rtl
 .endproc
 
@@ -319,11 +322,8 @@ Loop:
 ; 16-bit accumulator and index
 .a16
 .i16
+.export RenderLevelRowBottom
 .proc RenderLevelRowBottom
-  phb
-  phk
-  plb
-
   lda #20
   sta TempVal
 
@@ -357,7 +357,5 @@ Loop:
   ; Stop after 64 tiles horizontally
   dec TempVal
   bne :-
-
-  plb
   rtl
 .endproc

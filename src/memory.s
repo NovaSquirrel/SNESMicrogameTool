@@ -103,6 +103,9 @@
   BlockUpdateDataBL:   .res BLOCK_UPDATE_COUNT*2
   BlockUpdateDataBR:   .res BLOCK_UPDATE_COUNT*2
 
+  OldScrollX: .res 2
+  OldScrollY: .res 2
+  GameInitPhase: .res 1
 
 .segment "BSS7E"
 
