@@ -49,10 +49,10 @@
   lda ActorSpeed,x
   jsl SpeedAngle2Offset256 ; A = speed, Y = angle -> 0,1,2(X) 2,3,4(Y)
   lda 1
-  asr_n 2
+  asr_n 6
   sta ActorVX,x
   lda 4
-  asr_n 2
+  asr_n 6
   sta ActorVY,x
   jmp ActorApplyVelocity
 .endproc
