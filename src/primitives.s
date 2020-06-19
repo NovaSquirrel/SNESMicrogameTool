@@ -33,12 +33,13 @@
   lda ActorPX,x
   add ActorVX,x
   sta ActorPX,x
-
+YOnly:
   lda ActorPY,x
   add ActorVY,x
   sta ActorPY,x
   rtl
 .endproc
+ActorApplyYVelocity = ActorApplyVelocity::YOnly
 
 .export ActorBallMovement
 .proc ActorBallMovement
@@ -539,14 +540,92 @@ No:
 .endproc
 .a16
 
-.export ActorFall
-.proc ActorFall
-  rtl
-.endproc
-
 .export ActorOverlapBlock
 .proc ActorOverlapBlock
   rtl
+.endproc
+
+.export ActorFall
+.proc ActorFall
+  jsl ActorGravity
+  jmp ActorCheckStandingOnSolid
+.endproc
+
+.export ActorCheckStandingOnSolid
+.proc ActorCheckStandingOnSolid
+  seta8
+  stz ActorOnGround,x
+  seta16
+
+  ; If going upwards, bounce against ceilings
+  stz 0
+
+  lda ActorVY,x
+  bpl NotUp
+    lda ActorPY,x
+    sub #$0080
+    tay
+    lda ActorPX,x
+    jsl ActorTryVertInteraction
+    asl
+    bcc :+
+      lda #$20
+      sta ActorVY,x
+      clc
+    :
+    rtl
+  NotUp:
+
+  ; Maybe add checks for the sides
+  lda ActorPY,x
+  add #$0080
+  tay
+  lda ActorPX,x
+  jsl ActorTryVertInteraction
+  cmp #$4000
+  rol 0
+
+  lda 0
+  seta8
+  sta ActorOnGround,x
+  ; React to touching the ground
+  beq :+
+    lda #$80
+    sta ActorPY,x ; Clear the low byte
+
+    seta16
+    stz ActorVY,x
+    sec
+    rtl
+  :
+  seta16
+  clc
+  rtl
+.endproc
+
+.export ActorTryVertInteraction
+.import BlockRunInteractionActorTopBottom
+.proc ActorTryVertInteraction
+  jsl GetLevelPtrXY
+  tay
+  lda [GameDataPointer_BlockFlags],y ; 16-bit read on 8-bit data
+  xba ; Put those flags in the high byte
+  rtl
+.endproc
+
+.export ActorGravity
+.proc ActorGravity
+  add ActorVY,x
+  sta ActorVY,x
+
+  ; Is it too high?
+  bmi OK
+  cmp #$0060
+  bcc OK
+  lda #$0060
+  sta ActorVY,x
+OK:
+  jml ActorApplyYVelocity
 .endproc
 
 .export BlockChangeType
@@ -671,4 +750,26 @@ Shift:
 Shift:
   asr_n 3
   jmp ScrollSpeedLimit
+.endproc
+
+; Sets LevelBlockPtr to point to a specific coordinate in the level
+; input: A (X position in 12.4 format), Y (Y position in 12.4 format)
+.export GetLevelPtrXY
+.proc GetLevelPtrXY
+  ; X position * 128
+  lsr
+  and #%0011111110000000
+  sta LevelBlockPtr
+  ; 00xxxxxxx0000000
+
+  ; Y position
+  tya
+  xba
+  and #127
+  tsb LevelBlockPtr
+  ; 00xxxxxxxyyyyyyy
+
+  lda [LevelBlockPtr]
+  and #255
+  rtl
 .endproc

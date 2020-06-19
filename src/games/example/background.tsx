@@ -50,11 +50,31 @@
  <tile id="14" type="block"/>
  <tile id="15" type="block"/>
  <tile id="16" type="block"/>
- <tile id="17" type="block"/>
- <tile id="18" type="block"/>
- <tile id="19" type="block"/>
- <tile id="20" type="block"/>
- <tile id="21" type="block"/>
+ <tile id="17" type="block">
+  <properties>
+   <property name="solid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="18" type="block">
+  <properties>
+   <property name="solid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="19" type="block">
+  <properties>
+   <property name="solid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="20" type="block">
+  <properties>
+   <property name="solid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="21" type="block">
+  <properties>
+   <property name="solid" type="bool" value="true"/>
+  </properties>
+ </tile>
  <tile id="22" type="block"/>
  <tile id="23" type="block"/>
  <tile id="24" type="block"/>
