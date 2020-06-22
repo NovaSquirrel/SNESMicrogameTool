@@ -1387,6 +1387,34 @@ Blockly.defineBlocksWithJsonArray([{
   "helpUrl": ""
 },
 {
+  "type": "actor_ran_into_block",
+  "message0": "Actor ran into block type %1",
+  "args0": [
+    {
+      "type": "input_value",
+      "name": "NAME"
+    }
+  ],
+  "output": "Boolean",
+  "colour": 210,
+  "tooltip": "",
+  "helpUrl": ""
+},
+{
+  "type": "actor_ran_into_block_class",
+  "message0": "Actor ran into block class %1",
+  "args0": [
+    {
+      "type": "input_value",
+      "name": "NAME"
+    }
+  ],
+  "output": "Boolean",
+  "colour": 210,
+  "tooltip": "",
+  "helpUrl": ""
+},
+{
   "type": "actor_overlap_block",
   "message0": "Actor touching block type %1",
   "args0": [

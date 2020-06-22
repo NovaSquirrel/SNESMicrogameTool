@@ -75,6 +75,8 @@ conditions['actor-on-ground'] = 'lda ActorOnGround,x'
 conditions_flags['actor-on-ground'] = 'eq'
 conditions['actor-overlap-block'] = ('jsl ActorOverlapBlock', 1)
 conditions_flags['actor-overlap-block'] = 'cc'
+conditions['actor-ran-into-block'] = ('jsl ActorRanIntoBlock', 1)
+conditions_flags['actor-ran-into-block'] = 'cc'
 
 conditions['always'] = 'clc' # dummy, probably shouldn't use
 conditions_flags['always'] = 'cc'
@@ -212,6 +214,7 @@ actions['vector-movement'] = 'jsl ActorApplyVelocity'
 actions['vector-movement-stop'] = 'jsl ActorApplyVelocity'
 actions['vector-movement-reflect'] = 'jsl ActorApplyVelocity'
 actions['8way-movement'] = ('Actor8WayMovement', 1)
+actions['8way-movement-stop'] = ('Actor8WayMovementCollide', 1)
 actions['win-game'] = 'jsl WinGame'
 actions['lose-game'] = 'jsl LoseGame'
 actions['jump-to-xy'] = ('ActorJumpToXY', 2)

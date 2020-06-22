@@ -107,6 +107,11 @@
   OldScrollY: .res 2
   GameInitPhase: .res 1
 
+  RanIntoBlockAType:     .res 2
+  RanIntoBlockAPosition: .res 2
+  RanIntoBlockBType:     .res 2
+  RanIntoBlockBPosition: .res 2
+
 .segment "BSS7E"
 
 .segment "BSS7F"

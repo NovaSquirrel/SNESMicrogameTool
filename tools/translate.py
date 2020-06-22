@@ -148,6 +148,14 @@ def cnd_touching_type(block):
 	return ['touching-type', block.translate_value('NAME')]
 conditions['touching_type'] = cnd_touching_type
 
+def cnd_actor_ran_into_block(block):
+	return ['actor-ran-into-block', block.translate_value('NAME')]
+conditions['actor_ran_into_block'] = cnd_actor_ran_into_block
+
+def cnd_actor_ran_into_block_class(block):
+	return ['actor-ran-into-block-class', block.translate_value('NAME')]
+conditions['actor_ran_into_block_class'] = cnd_actor_ran_into_block_class
+
 def cnd_actor_overlap_block(block):
 	return ['actor-overlap-block', block.translate_value('NAME')]
 conditions['actor_overlap_block'] = cnd_actor_overlap_block
@@ -302,7 +310,10 @@ def blk_eightway_movement(block):
 		allowed |= 0x0400
 	if block.field['UP'] == 'TRUE':
 		allowed |= 0x0800
-	return ['8way-movement', allowed]
+	if block.field['COLLIDE'] == 'TRUE':
+		return ['8way-movement-stop', allowed]
+	else:
+		return ['8way-movement', allowed]
 blocks['eightway_movement'] = blk_eightway_movement
 
 def blk_win_game(block):

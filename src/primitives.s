@@ -97,6 +97,148 @@ ActorApplyYVelocity = ActorApplyVelocity::YOnly
   rtl
 .endproc
 
+; Inputs: A (Allowed directions)
+.export Actor8WayMovementCollide
+.proc Actor8WayMovementCollide
+  stz RanIntoBlockAType
+  stz RanIntoBlockBType
+
+  and keydown
+  sta 0
+
+  and #KEY_LEFT
+  beq NotLeft
+    lda ActorPX,x
+    sub ActorSpeed,x
+    sta ActorPX,x
+
+    ; Above
+    lda ActorPY,x
+    sub #$0070
+    tay
+    lda ActorPX,x
+    sub #$0080
+    jsr TestSolid
+    bcs SnapLeft
+
+    ; Below
+    lda ActorPY,x
+    add #$0070
+    tay
+    lda ActorPX,x
+    sub #$0080
+    jsr TestSolid
+    bcc NotLeft
+
+  SnapLeft:
+    lda ActorPX,x
+    and #$ff00
+    ora #$0080
+    sta ActorPX,x
+NotLeft:
+
+  lda 0
+  and #KEY_RIGHT
+  beq NotRight
+    lda ActorPX,x
+    add ActorSpeed,x
+    sta ActorPX,x
+
+    ; Above
+    lda ActorPY,x
+    sub #$0070
+    tay
+    lda ActorPX,x
+    add #$0080
+    jsr TestSolid
+    bcs SnapRight
+
+    ; Below
+    lda ActorPY,x
+    add #$0070
+    tay
+    lda ActorPX,x
+    add #$0080
+    jsr TestSolid
+    bcc NotRight
+
+  SnapRight:
+    lda ActorPX,x
+    and #$ff00
+    ora #$0080
+    sta ActorPX,x
+NotRight:
+
+  lda 0
+  and #KEY_DOWN
+  beq NotDown
+    lda ActorPY,x
+    add ActorSpeed,x
+    sta ActorPY,x
+
+    lda ActorPY,x
+    add #$0080
+    tay
+    lda ActorPX,x
+    jsr TestSolid
+    bcc NotDown
+
+NotDown:
+
+  lda 0
+  and #KEY_UP
+  beq NotUp
+    lda ActorPY,x
+    sub ActorSpeed,x
+    sta ActorPY,x
+
+    lda ActorPY,x
+    sub #$0080
+    tay
+    lda ActorPX,x
+    jsr TestSolid
+    bcc NotUp
+
+NotUp:
+  rtl
+
+; Test the coordinates against a solid block
+TestSolid:
+  jsl GetLevelPtrXY
+  tay
+  lda [GameDataPointer_BlockFlags],y ; 16-bit read on 8-bit data
+  xba ; Put those flags in the high byte
+  asl ; Shift out the solid bit
+  php
+  bcc :+
+    jsr RecordCollidedWith
+  :
+  plp
+  rts
+
+; Record what it collided with so later logic can use it
+RecordCollidedWith:
+  lda RanIntoBlockAType
+  beq StoreA
+  lda RanIntoBlockBType
+  beq StoreB
+  rts
+StoreA:
+  lda [LevelBlockPtr]
+  and #255
+  sta RanIntoBlockAType
+  lda LevelBlockPtr
+  sta RanIntoBlockAPosition
+  rts
+StoreB:
+  lda [LevelBlockPtr]
+  and #255
+  sta RanIntoBlockBType
+  lda LevelBlockPtr
+  sta RanIntoBlockAPosition
+  rts
+.endproc
+
 ; Inputs: A (Actor type to find)
 ; Outputs: Carry (success), OtherActor (found index)
 .export ActorFindType
@@ -542,6 +684,28 @@ No:
 
 .export ActorOverlapBlock
 .proc ActorOverlapBlock
+  clc
+  rtl
+.endproc
+
+.export ActorRanIntoBlock
+.proc ActorRanIntoBlock
+  cmp RanIntoBlockAType
+  beq YesA
+  cmp RanIntoBlockBType
+  beq YesB
+  clc
+  rtl
+
+YesA:
+  lda RanIntoBlockAPosition
+  sta LevelBlockPtr
+  sec
+  rtl
+YesB:
+  lda RanIntoBlockBPosition
+  sta LevelBlockPtr
+  sec
   rtl
 .endproc
 
@@ -558,29 +722,55 @@ No:
   seta16
 
   ; If going upwards, bounce against ceilings
-  stz 0
-
   lda ActorVY,x
   bpl NotUp
+    ; Left
     lda ActorPY,x
     sub #$0080
     tay
     lda ActorPX,x
+    sub #$0070
     jsl ActorTryVertInteraction
     asl
-    bcc :+
-      lda #$20
-      sta ActorVY,x
-      clc
-    :
+    bcs BumpAgainstCeiling
+
+    ; Right
+    lda ActorPY,x
+    sub #$0080
+    tay
+    lda ActorPX,x
+    add #$0070
+    jsl ActorTryVertInteraction
+    asl
+    bcs BumpAgainstCeiling
+
+    ; Not touching ceiling
+    clc
+    rtl
+  BumpAgainstCeiling:
+    lda #$20
+    sta ActorVY,x
+    clc
     rtl
   NotUp:
 
-  ; Maybe add checks for the sides
+  stz 0
+
+  ; Left
   lda ActorPY,x
   add #$0080
   tay
+  phy
   lda ActorPX,x
+  sub #$0070
+  jsl ActorTryVertInteraction
+  cmp #$4000
+  rol 0
+
+  ; Right
+  ply
+  lda ActorPX,x
+  add #$0070
   jsl ActorTryVertInteraction
   cmp #$4000
   rol 0

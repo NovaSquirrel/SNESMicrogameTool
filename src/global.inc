@@ -31,6 +31,7 @@
 .global VectorMovementStop
 .global VectorMovementReflect
 .global Actor8WayMovement
+.global Actor8WayMovementCollide
 .global WinGame
 .global LoseGame
 .global ActorJumpToXY
@@ -57,6 +58,7 @@
 .global RandomChance
 .global ActorInRegion
 .global ActorTouchingType
+.global ActorRanIntoBlock
 .global ActorOverlapBlock
 
 LEVEL_HEIGHT = 128
