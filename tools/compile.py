@@ -75,10 +75,16 @@ conditions['actor-on-ground'] = 'lda ActorOnGround,x'
 conditions_flags['actor-on-ground'] = 'eq'
 conditions['actor-overlap-block'] = ('jsl ActorOverlapBlock', 1)
 conditions_flags['actor-overlap-block'] = 'cc'
+conditions['actor-overlap-block-class'] = ('jsl ActorOverlapBlockClass', 1)
+conditions_flags['actor-overlap-block-class'] = 'cc'
 conditions['actor-center-overlap-block'] = ('jsl ActorCenterOverlapBlock', 1)
 conditions_flags['actor-center-overlap-block'] = 'cc'
+conditions['actor-center-overlap-block-class'] = ('jsl ActorCenterOverlapBlockClass', 1)
+conditions_flags['actor-center-overlap-block-class'] = 'cc'
 conditions['actor-ran-into-block'] = ('jsl ActorRanIntoBlock', 1)
 conditions_flags['actor-ran-into-block'] = 'cc'
+conditions['actor-ran-into-block-class'] = ('jsl ActorRanIntoBlockClass', 1)
+conditions_flags['actor-ran-into-block-class'] = 'cc'
 
 conditions['always'] = 'clc' # dummy, probably shouldn't use
 conditions_flags['always'] = 'cc'
@@ -421,6 +427,8 @@ def compile_value(value):
 		return '#KeyValue::K_'+s[1]
 	elif s[0] == 'block':
 		return ('#%s_Block::' % gamename)+s[1]
+	elif s[0] == 'block-class':
+		return ('#%s_BlockClass::' % gamename)+s[1]
 	elif s[0] == 'variable':
 		return 'Variable_'+s[1] #TODO: allocate per-game?
 	else:
@@ -636,6 +644,7 @@ def compile_microgame(game, output, name, maps, animations):
 	# write flags for each block
 	outfile.write('.proc %s_BlockFlags\n' % gamename)
 	outfile.write('.byt 0\n')
+	block_class_list = ['none']
 	for block in maps.map_tiles_used:
 		data = maps.blocks[block]['data']
 		if data:
@@ -644,6 +653,13 @@ def compile_microgame(game, output, name, maps, animations):
 				out |= 0xc0
 			if 'solid_top' in data and data['solid_top']:
 				out |= 0x40
+			if 'class' in data:
+				if data['class'] in block_class_list:
+					out |= block_class_list.index(data['class'])
+				else:
+					out |= len(block_class_list)
+					block_class_list.append(data['class'])
+					assert len(block_class_list) < 32
 			outfile.write('.byt %d\n' % out)
 		else:
 			outfile.write('.byt 0\n')
@@ -655,6 +671,12 @@ def compile_microgame(game, output, name, maps, animations):
 		data = maps.blocks[block]['data']
 		if data and 'name' in data:
 			outfile.write('%s = %d\n' % (data['name'], all_blocks.index(block)))
+	outfile.write('.endenum\n\n')
+
+	# write enums for each block class
+	outfile.write('.enum %s_BlockClass\n' % gamename)
+	for bc in block_class_list:
+		outfile.write('%s\n' % bc)
 	outfile.write('.endenum\n\n')
 
 	# write the list of maps

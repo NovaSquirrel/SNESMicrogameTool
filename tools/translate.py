@@ -77,6 +77,8 @@ class Block(object):
 			return 'actor:'+block.field['NAME']
 		elif block.type == 'block_type':
 			return 'block:'+block.field['NAME']
+		elif block.type == 'block_class':
+			return 'block-class:'+block.field['NAME']
 		elif block.type == 'coordinate_pixels':
 			return 16*int(block.field['NUM'])
 		elif block.type == 'variables_get':

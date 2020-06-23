@@ -104,7 +104,21 @@
                       </block>
                     </value>
                     <value name="B">
-                      <block type="actor_on_ground" id="UNhr-CGSc6x|6)e0lF7j"></block>
+                      <block type="logic_operation" id="eC{ZY4_$TKa?)4FfH#+M">
+                        <field name="OP">OR</field>
+                        <value name="A">
+                          <block type="actor_on_ground" id="UNhr-CGSc6x|6)e0lF7j"></block>
+                        </value>
+                        <value name="B">
+                          <block type="actor_center_overlap_block_class" id="=FZ4*sP_#`h|XS#S{X+X">
+                            <value name="NAME">
+                              <block type="block_class" id="byRn~/RY*FMkt%uQGU_b">
+                                <field name="NAME">water</field>
+                              </block>
+                            </value>
+                          </block>
+                        </value>
+                      </block>
                     </value>
                   </block>
                 </value>

@@ -768,6 +768,93 @@ YesB:
   rtl
 .endproc
 
+.export ActorRanIntoBlockClass
+.proc ActorRanIntoBlockClass
+  sta 0
+  lda RanIntoBlockAType
+  jsr CompareAgainstBlockClass
+  beq ActorRanIntoBlock::YesA
+  lda RanIntoBlockBType
+  jsr CompareAgainstBlockClass
+  beq ActorRanIntoBlock::YesB
+  clc
+  rtl
+.endproc
+
+.proc CompareAgainstBlockClass
+  tay
+  lda [GameDataPointer_BlockFlags],y ; 16-bit read on 8-bit data
+  and #31
+  cmp 0
+  rts
+.endproc
+
+.export ActorOverlapBlockClass
+.proc ActorOverlapBlockClass
+  sta 0
+
+  ; Top left
+  lda ActorPY,x
+  sub #$0070
+  sta 2
+  tay
+  lda ActorPX,x
+  sub #$0070
+  jsl GetLevelPtrXY
+  jsr CompareAgainstBlockClass
+  beq Yes
+
+  ; Top right
+  ldy 2
+  lda ActorPX,x
+  add #$0070
+  sta 4
+  jsl GetLevelPtrXY
+  jsr CompareAgainstBlockClass
+  beq Yes
+
+  ; Bottom left
+  lda ActorPY,x
+  add #$0070
+  sta 2
+  tay
+  lda ActorPX,x
+  sub #$0070
+  jsl GetLevelPtrXY
+  jsr CompareAgainstBlockClass
+  beq Yes
+
+  ; Bottom right
+  ldy 2
+  lda 4
+  jsl GetLevelPtrXY
+  jsr CompareAgainstBlockClass
+  beq Yes
+
+  clc
+  rtl
+Yes:
+  sec
+  rtl
+.endproc
+
+.export ActorCenterOverlapBlockClass
+.proc ActorCenterOverlapBlockClass
+  sta 0
+  ldy ActorPY,x
+  lda ActorPX,x
+  jsl GetLevelPtrXY
+  jsr CompareAgainstBlockClass
+  beq Yes
+No:
+  clc
+  rtl
+Yes:
+  sec
+  rtl
+.endproc
+
+
 .export ActorFall
 .proc ActorFall
   jsl ActorGravity

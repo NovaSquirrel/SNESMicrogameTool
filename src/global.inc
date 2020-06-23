@@ -61,6 +61,9 @@
 .global ActorRanIntoBlock
 .global ActorCenterOverlapBlock
 .global ActorOverlapBlock
+.global ActorRanIntoBlockClass
+.global ActorCenterOverlapBlockClass
+.global ActorOverlapBlockClass
 
 LEVEL_HEIGHT = 128
 LEVEL_WIDTH  = 128

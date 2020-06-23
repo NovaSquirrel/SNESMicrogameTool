@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.2" tiledversion="1.3.4" name="background" tilewidth="16" tileheight="16" tilecount="128" columns="8">
+<tileset version="1.2" tiledversion="1.3.4" name="background" tilewidth="16" tileheight="16" tilecount="96" columns="8">
  <image source="background.png" width="128" height="192"/>
  <tile id="0" type="block"/>
  <tile id="1" type="block">
@@ -47,7 +47,11 @@
    <property name="solid" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="14" type="block"/>
+ <tile id="14" type="block">
+  <properties>
+   <property name="name" value="ladder"/>
+  </properties>
+ </tile>
  <tile id="15" type="block"/>
  <tile id="16" type="block"/>
  <tile id="17" type="block">
@@ -75,8 +79,18 @@
    <property name="solid" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="22" type="block"/>
- <tile id="23" type="block"/>
+ <tile id="22" type="block">
+  <properties>
+   <property name="class" value="water"/>
+   <property name="name" value="water_top"/>
+  </properties>
+ </tile>
+ <tile id="23" type="block">
+  <properties>
+   <property name="class" value="water"/>
+   <property name="name" value="water"/>
+  </properties>
+ </tile>
  <tile id="24" type="block"/>
  <tile id="25" type="block"/>
  <tile id="26" type="block"/>

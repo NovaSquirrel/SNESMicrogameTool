@@ -164,7 +164,7 @@ class TiledMapTileset():
 					value = p.attrib['value']
 					if type == 'bool':
 						tile_properties[name] = value == 'true'
-					elif type == 'string':
+					elif type == 'string' and value != '':
 						tile_properties[name] = value
 				self.tiles[id] = tile_properties
 
