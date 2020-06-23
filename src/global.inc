@@ -59,6 +59,7 @@
 .global ActorInRegion
 .global ActorTouchingType
 .global ActorRanIntoBlock
+.global ActorCenterOverlapBlock
 .global ActorOverlapBlock
 
 LEVEL_HEIGHT = 128

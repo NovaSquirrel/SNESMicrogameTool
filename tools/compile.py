@@ -75,6 +75,8 @@ conditions['actor-on-ground'] = 'lda ActorOnGround,x'
 conditions_flags['actor-on-ground'] = 'eq'
 conditions['actor-overlap-block'] = ('jsl ActorOverlapBlock', 1)
 conditions_flags['actor-overlap-block'] = 'cc'
+conditions['actor-center-overlap-block'] = ('jsl ActorCenterOverlapBlock', 1)
+conditions_flags['actor-center-overlap-block'] = 'cc'
 conditions['actor-ran-into-block'] = ('jsl ActorRanIntoBlock', 1)
 conditions_flags['actor-ran-into-block'] = 'cc'
 
@@ -429,6 +431,8 @@ def compile_block(block):
 	for action in block:
 		if type(action) == list:
 			""" Action """
+			if len(action) == 0:
+				continue
 			name = action[0]
 			args = action[1:]
 			if name in actions:
@@ -518,6 +522,7 @@ def compile_microgame(game, output, name, maps, animations):
 	# write background CHR
 	outfile.write('.segment "GameChr_%s"\n\n' % gamename)
 	outfile.write('.proc %s_ChrData\n' % gamename)
+	assert len(maps.map_chr) <= 1024
 	for tile in maps.map_chr:
 		outfile.write('  .byt %s\n' % (', '.join(['$%.2X' % x for x in tile])))
 	outfile.write('.endproc\n%s_EndChrData:\n\n' % gamename)

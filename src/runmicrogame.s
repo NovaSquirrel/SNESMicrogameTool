@@ -204,6 +204,7 @@ RowsLeft = 7
 
   ; Now Y points at the map data itself
   ldx #0
+  iny
 Loop:
   lda [Pointer],y
   iny
@@ -258,6 +259,7 @@ ActorLoop:
   iny
   iny
   lda [Pointer],y
+  sub #$0100
   sta ActorPY,x
   iny
   iny
@@ -296,7 +298,7 @@ LastActor:
   sta NTADDR+2   ; plane 2 nametable at $e000, 1 screen
 
   stz PPURES
-  lda #%00010011  ; enable plane 0 and 1 and sprites
+  lda #%00010001  ; enable plane 0 and sprites
   sta BLENDMAIN
   stz BLENDSUB
   lda #VBLANK_NMI|AUTOREAD
@@ -354,6 +356,33 @@ Forever:
     jsl RenderLevelRowUpload
     stz RowUpdateAddress
   :
+
+  ; Do block updates
+  seta16
+  ldx #(BLOCK_UPDATE_COUNT-1)*2
+BlockUpdateLoop:
+  lda BlockUpdateAddress,x
+  beq SkipBlock
+  wdm 0
+  sta PPUADDR
+  lda BlockUpdateDataTL,x
+  sta PPUDATA
+  lda BlockUpdateDataTR,x
+  sta PPUDATA
+
+  lda BlockUpdateAddress,x ; Move down a row
+  add #(32*2)>>1
+  sta PPUADDR
+  lda BlockUpdateDataBL,x
+  sta PPUDATA
+  lda BlockUpdateDataBR,x
+  sta PPUDATA
+
+  stz BlockUpdateAddress,x ; Cancel out the block now that it's been written
+SkipBlock:
+  dex
+  dex
+  bpl BlockUpdateLoop
 
   ; -------------------------------------------------------
   ; Wait for the controller information to be ready

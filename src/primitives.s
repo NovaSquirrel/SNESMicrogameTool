@@ -684,7 +684,66 @@ No:
 
 .export ActorOverlapBlock
 .proc ActorOverlapBlock
+  sta 0
+
+  ; Top left
+  lda ActorPY,x
+  sub #$0070
+  sta 2
+  tay
+  lda ActorPX,x
+  sub #$0070
+  jsl GetLevelPtrXY
+  cmp 0
+  beq Yes
+
+  ; Top right
+  ldy 2
+  lda ActorPX,x
+  add #$0070
+  sta 4
+  jsl GetLevelPtrXY
+  cmp 0
+  beq Yes
+
+  ; Bottom left
+  lda ActorPY,x
+  add #$0070
+  sta 2
+  tay
+  lda ActorPX,x
+  sub #$0070
+  jsl GetLevelPtrXY
+  cmp 0
+  beq Yes
+
+  ; Bottom right
+  ldy 2
+  lda 4
+  jsl GetLevelPtrXY
+  cmp 0
+  beq Yes
+
   clc
+  rtl
+Yes:
+  sec
+  rtl
+.endproc
+
+.export ActorCenterOverlapBlock
+.proc ActorCenterOverlapBlock
+  sta 0
+  ldy ActorPY,x
+  lda ActorPX,x
+  jsl GetLevelPtrXY
+  cmp 0
+  beq Yes
+No:
+  clc
+  rtl
+Yes:
+  sec
   rtl
 .endproc
 
@@ -820,6 +879,132 @@ OK:
 
 .export BlockChangeType
 .proc BlockChangeType
+Temp = 0
+  phx
+  phy
+  php
+  seta8
+  sta [LevelBlockPtr] ; Make the change in the level buffer itself
+  setaxy16
+
+  ; Find a free index in the block update queue
+  ldx #(BLOCK_UPDATE_COUNT-1)*2
+FindIndex:
+  ldy BlockUpdateAddress,x ; Test for zero (exact value not used)
+  beq Found
+  dex                      ; Next index
+  dex
+  bpl FindIndex            ; Give up if all slots full
+  jmp Exit
+Found:
+  ; From this point on in the routine, X = free update queue index
+
+  ; Save block number in Y for [zeropage],y
+  and #255
+  asl
+  tay
+  ; Now the accumulator is free to do other things
+
+  ; -----------------------------------
+
+  ; First, make sure the block is actually onscreen (Horizontally)
+  lda LevelBlockPtr ; Get level column
+  asl
+  xba
+  seta8
+  sta Temp ; Store column so it can be compared against
+
+  lda ScrollX+1
+  sub #1
+  bcc @FineLeft
+  cmp Temp
+  bcc @FineLeft
+  jmp Exit
+@FineLeft:
+
+  lda ScrollX+1
+  add #16+1
+  bcs @FineRight
+  cmp Temp
+  bcs @FineRight
+  jmp Exit
+@FineRight:
+  seta16
+
+  ; -----------------------------------
+
+  ; Second, make sure the block is actually onscreen (Vertically)
+  lda LevelBlockPtr ; Get level row
+  and #127
+  seta8
+  sta Temp ; Store row so it can be compared against
+
+  lda ScrollY+1
+  sub #1
+  bcc @FineUp
+  cmp Temp
+  bcc @FineUp
+  jmp Exit
+@FineUp:
+
+  lda ScrollY+1
+  add #16+1
+  bcs @FineDown
+  cmp Temp
+  bcs @FineDown
+  jmp Exit
+@FineDown:
+  seta16
+
+  ; -----------------------------------
+
+  ; Copy the block appearance into the update buffer
+  lda [GameDataPointer_BlockUL],y
+  sta BlockUpdateDataTL,x
+  lda [GameDataPointer_BlockUR],y
+  sta BlockUpdateDataTR,x
+  lda [GameDataPointer_BlockLL],y
+  sta BlockUpdateDataBL,x
+  lda [GameDataPointer_BlockLR],y
+  sta BlockUpdateDataBR,x
+
+  ; Now calculate the PPU address
+  ; LevelBlockPtr is 00xxxxxxxyyyyyyy
+  ; Needs to become  0...pyyyyyxxxxx0
+  lda LevelBlockPtr
+  and #%1111 ; Grab Y & 15
+  asl
+  asl
+  asl
+  asl
+  asl
+  asl
+  ora #ForegroundBG>>1
+  sta BlockUpdateAddress,x
+
+  ; Add in X
+  lda LevelBlockPtr
+  asl
+  xba
+  and #15
+  asl
+  ora BlockUpdateAddress,x
+  sta BlockUpdateAddress,x
+
+  ; Choose second screen if needed
+  lda LevelBlockPtr
+  and #%0000100000000000
+  beq :+
+    lda BlockUpdateAddress,x
+    ora #2048>>1
+    sta BlockUpdateAddress,x
+  :
+
+  ; Restore registers
+Exit:
+  plp
+  ply
+  plx
   rtl
 .endproc
 
@@ -827,24 +1012,50 @@ OK:
 .proc ScrollTargetActor
 TargetX = 0
 TargetY = 2
-  ; Find the target scroll positions
+Temp = 4
+  ; Calculate max X scroll
+  lda MapWidth
+  and #255
+  sub #16
+  bcs :+
+    lda #0
+  :
+  xba
+  sta Temp
+
+  ; Find the target X scroll position
   lda ActorPX,x
   sub #8*256
   bcs :+
     lda #0
+: cmp Temp
+  bcc :+
+    lda Temp
 : sta TargetX
 
+  ; Calculate max Y scroll
+  lda MapHeight
+  and #255
+  sub #14 ; 14 instead of 16 to account for the screen being shorter than it is wide
+  bcs :+
+    lda #0
+  :
+  xba
+  sta Temp
+
+  ; Find the target Y scroll position
   lda ActorPY,x
   sub #8*256  ; Pull back to center vertically
   bcs :+
     lda #0
-: cmp #(256+32)*16 ; Limit to two screens of vertical scrolling
+: cmp Temp
   bcc :+
-  lda #(256+32)*16
+  lda Temp
 : sta TargetY
   rts
 .endproc
 
+; Only allow scrolling up to 8 pixels/frame
 .proc ScrollSpeedLimit
   ; Take absolute value
   php
