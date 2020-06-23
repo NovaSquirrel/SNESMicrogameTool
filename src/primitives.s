@@ -1025,8 +1025,10 @@ Temp = 4
 
   ; Find the target X scroll position
   lda ActorPX,x
+  bmi @ZeroX
   sub #8*256
   bcs :+
+@ZeroX:
     lda #0
 : cmp Temp
   bcc :+
@@ -1045,8 +1047,10 @@ Temp = 4
 
   ; Find the target Y scroll position
   lda ActorPY,x
+  bmi @ZeroY
   sub #8*256  ; Pull back to center vertically
   bcs :+
+@ZeroY:
     lda #0
 : cmp Temp
   bcc :+

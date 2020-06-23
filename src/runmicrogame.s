@@ -363,7 +363,6 @@ Forever:
 BlockUpdateLoop:
   lda BlockUpdateAddress,x
   beq SkipBlock
-  wdm 0
   sta PPUADDR
   lda BlockUpdateDataTL,x
   sta PPUDATA
