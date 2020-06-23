@@ -55,6 +55,24 @@ USE_AUDIO = 1
 ;    jsl spc_boot_apu
   .endif
 
+  seta8
+  setxy16
+  phk
+  plb
+  ; Clear the first 512 bytes manually here
+  ldx #512-1
+: stz 0, x
+  dex
+  bpl :-
+
+  ; Clear the rest of the first 64KB
+  ldx #512
+  ldy #$10000 - 512
+  jsl MemClear
+  ldx #0
+  txy
+  jsl MemClear7F
+
   .import StartMicrogame
   jml StartMicrogame
 
