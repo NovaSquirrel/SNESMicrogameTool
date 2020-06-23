@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.2" tiledversion="1.3.4" name="background" tilewidth="16" tileheight="16" tilecount="64" columns="8">
- <image source="background.png" width="128" height="128"/>
+<tileset version="1.2" tiledversion="1.3.4" name="background" tilewidth="16" tileheight="16" tilecount="128" columns="8">
+ <image source="background.png" width="128" height="192"/>
  <tile id="0" type="block"/>
  <tile id="1" type="block">
   <properties>
@@ -159,6 +159,36 @@
   </properties>
  </tile>
  <tile id="55" type="block">
+  <properties>
+   <property name="solid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="61" type="block">
+  <properties>
+   <property name="solid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="62" type="block">
+  <properties>
+   <property name="solid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="63" type="block">
+  <properties>
+   <property name="solid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="69" type="block">
+  <properties>
+   <property name="solid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="70" type="block">
+  <properties>
+   <property name="solid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="71" type="block">
   <properties>
    <property name="solid" type="bool" value="true"/>
   </properties>

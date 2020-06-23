@@ -59,13 +59,18 @@
           </block>
         </value>
         <next>
-          <block type="scroll_follow_actor" id="BVVHajzss:(lFS/BIswF">
-            <field name="SLOW">DIV1</field>
+          <block type="note" id="mU?,2w]Bt~bS{cpHv$E(">
+            <field name="NAME">Immediately set the scroll without sliding</field>
             <next>
-              <block type="animation" id="tsPX.pA%s^?)r#4)K9z9">
-                <field name="NAME">smiley</field>
-                <field name="XFLIP">FALSE</field>
-                <field name="YFLIP">FALSE</field>
+              <block type="scroll_follow_actor" id="BVVHajzss:(lFS/BIswF">
+                <field name="SLOW">DIV1</field>
+                <next>
+                  <block type="animation" id="tsPX.pA%s^?)r#4)K9z9">
+                    <field name="NAME">smiley</field>
+                    <field name="XFLIP">FALSE</field>
+                    <field name="YFLIP">FALSE</field>
+                  </block>
+                </next>
               </block>
             </next>
           </block>
@@ -198,7 +203,7 @@
                                   </block>
                                 </value>
                                 <value name="B">
-                                  <block type="actor_overlap_block" id="yc7B15anVEkP[MO:m!wX">
+                                  <block type="actor_ran_into_block" id="_+Y@v!Ea?f(Bvw?IS[6Y">
                                     <value name="NAME">
                                       <block type="block_type" id="c5Xfy{.Lvt!Boy7^yAZs">
                                         <field name="NAME">red_lock</field>
@@ -228,8 +233,13 @@
                               </block>
                             </statement>
                             <next>
-                              <block type="scroll_follow_actor" id="mAg.]Ro-F-g.!@8.JCN2">
-                                <field name="SLOW">DIV4</field>
+                              <block type="note" id="^%hc__9[k7v9:gXj?SXQ">
+                                <field name="NAME">Gradually scroll to follow the player</field>
+                                <next>
+                                  <block type="scroll_follow_actor" id="mAg.]Ro-F-g.!@8.JCN2">
+                                    <field name="SLOW">DIV4</field>
+                                  </block>
+                                </next>
                               </block>
                             </next>
                           </block>
