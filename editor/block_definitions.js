@@ -1386,6 +1386,72 @@ Blockly.defineBlocksWithJsonArray([{
   "tooltip": "",
   "helpUrl": ""
 },
+
+{
+  "type": "actor_hit_ceiling_block",
+  "message0": "Actor hit ceiling of block type %1",
+  "args0": [
+    {
+      "type": "input_value",
+      "name": "NAME"
+    }
+  ],
+  "output": "Boolean",
+  "colour": 210,
+  "tooltip": "",
+  "helpUrl": ""
+},
+{
+  "type": "actor_hit_ceiling_block_class",
+  "message0": "Actor hit ceiling of block class %1",
+  "args0": [
+    {
+      "type": "input_value",
+      "name": "NAME"
+    }
+  ],
+  "output": "Boolean",
+  "colour": 210,
+  "tooltip": "",
+  "helpUrl": ""
+},
+{
+  "type": "actor_hit_floor_block",
+  "message0": "Actor hit floor of block type %1",
+  "args0": [
+    {
+      "type": "input_value",
+      "name": "NAME"
+    }
+  ],
+  "output": "Boolean",
+  "colour": 210,
+  "tooltip": "",
+  "helpUrl": ""
+},
+{
+  "type": "actor_hit_floor_block_class",
+  "message0": "Actor hit floor of block class %1",
+  "args0": [
+    {
+      "type": "input_value",
+      "name": "NAME"
+    }
+  ],
+  "output": "Boolean",
+  "colour": 210,
+  "tooltip": "",
+  "helpUrl": ""
+},
+{
+  "type": "actor_hit_ceiling",
+  "message0": "Actor touched the ceiling",
+  "output": "Boolean",
+  "colour": 210,
+  "tooltip": "",
+  "helpUrl": ""
+},
+
 {
   "type": "actor_ran_into_block",
   "message0": "Actor ran into block type %1",
@@ -1630,6 +1696,40 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 120,
+  "tooltip": "",
+  "helpUrl": ""
+},
+{
+  "type": "vertical_logic_operation",
+  "message0": "%1 %2 %3",
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "OP",
+      "options": [
+        [
+          "and",
+          "AND"
+        ],
+        [
+          "or",
+          "OR"
+        ]
+      ]
+    },
+    {
+      "type": "input_value",
+      "name": "A",
+      "check": "Boolean"
+    },
+    {
+      "type": "input_value",
+      "name": "B",
+      "check": "Boolean"
+    }
+  ],
+  "output": "Boolean",
+  "colour": 210,
   "tooltip": "",
   "helpUrl": ""
 }

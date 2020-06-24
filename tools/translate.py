@@ -150,6 +150,24 @@ def cnd_touching_type(block):
 	return ['touching-type', block.translate_value('NAME')]
 conditions['touching_type'] = cnd_touching_type
 
+
+def cnd_actor_hit_ceiling_block(block):
+	return ['actor-hit-ceiling-block', block.translate_value('NAME')]
+conditions['actor_hit_ceiling_block'] = cnd_actor_hit_ceiling_block
+
+def cnd_actor_hit_ceiling_block_class(block):
+	return ['actor-hit-ceiling-block-class', block.translate_value('NAME')]
+conditions['actor_hit_ceiling_block_class'] = cnd_actor_hit_ceiling_block_class
+
+def cnd_actor_hit_floor_block(block):
+	return ['actor-hit-floor-block', block.translate_value('NAME')]
+conditions['actor_hit_floor_block'] = cnd_actor_hit_floor_block
+
+def cnd_actor_hit_floor_block_class(block):
+	return ['actor-hit-floor-block-class', block.translate_value('NAME')]
+conditions['actor_hit_floor_block_class'] = cnd_actor_hit_floor_block_class
+
+
 def cnd_actor_ran_into_block(block):
 	return ['actor-ran-into-block', block.translate_value('NAME')]
 conditions['actor_ran_into_block'] = cnd_actor_ran_into_block
@@ -195,6 +213,7 @@ conditions['asm_condition'] = cnd_asm_condition
 def cnd_logic_operation(block):
 	return [block.field['OP'].lower(), translate_condition(block.value['A']), translate_condition(block.value['B'])]
 conditions['logic_operation'] = cnd_logic_operation
+conditions['vertical_logic_operation'] = cnd_logic_operation
 
 def cnd_logic_compare(block):
 	comparisons = {}
@@ -221,6 +240,10 @@ conditions['logic_negate'] = cnd_logic_negate
 def cnd_actor_on_ground(block):
 	return ['actor-on-ground']
 conditions['actor_on_ground'] = cnd_actor_on_ground
+
+def cnd_actor_hit_ceiling(block):
+	return ['actor-hit-ceiling']
+conditions['actor_hit_ceiling'] = cnd_actor_hit_ceiling
 
 def cnd_actor_hit_wall(block):
 	return ['actor-hit-wall']

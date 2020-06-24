@@ -269,102 +269,92 @@
               </block>
             </value>
             <next>
-              <block type="controls_if" id="!a3lRVP{ysEdbtQz]Sq7">
+              <block type="controls_if" id="AB(:54w}:LF0{bXL0Z2`">
                 <value name="IF0">
-                  <block type="logic_operation" id="XN:]w6!yJP+M2J!_Ttk~">
-                    <field name="OP">AND</field>
-                    <value name="A">
-                      <block type="keys" id="oA#1!ZOgtu2c:Zw;DN(g">
-                        <field name="KEY">B</field>
-                        <field name="STATE">PRESSED</field>
-                      </block>
-                    </value>
-                    <value name="B">
-                      <block type="logic_operation" id="eC{ZY4_$TKa?)4FfH#+M">
-                        <field name="OP">OR</field>
-                        <value name="A">
-                          <block type="actor_on_ground" id="UNhr-CGSc6x|6)e0lF7j"></block>
-                        </value>
-                        <value name="B">
-                          <block type="actor_center_overlap_block_class" id="=FZ4*sP_#`h|XS#S{X+X">
-                            <value name="NAME">
-                              <block type="block_class" id="byRn~/RY*FMkt%uQGU_b">
-                                <field name="NAME">water</field>
-                              </block>
-                            </value>
-                          </block>
-                        </value>
+                  <block type="actor_hit_ceiling_block" id="+UJ3|B8GQz*YZynZOQ!B">
+                    <value name="NAME">
+                      <block type="block_type" id=",y)dT@!etWOPjbbUck3X">
+                        <field name="NAME">wood</field>
                       </block>
                     </value>
                   </block>
                 </value>
                 <statement name="DO0">
-                  <block type="set_nomath" id="k^LmIJ$#W#]JKb54a`5h">
-                    <value name="LEFT">
-                      <block type="property" id="%V4O-V[M=OXMG@cqoe)8">
-                        <field name="NAME">YVEL</field>
-                      </block>
-                    </value>
-                    <value name="RIGHT">
-                      <block type="math_number" id="(flzbNdfqIHPUh+pq+J3">
-                        <field name="NUM">-80</field>
+                  <block type="block_change_type" id="@{5TiM=eC^@yMZgWf04~">
+                    <value name="NAME">
+                      <block type="block_type" id="Mz(sT^?2_}B4nJ(m9q=y">
+                        <field name="NAME">empty</field>
                       </block>
                     </value>
                   </block>
                 </statement>
                 <next>
-                  <block type="controls_if" id="XV{+|U(q.*$nrVk4H)*U">
+                  <block type="controls_if" id="!a3lRVP{ysEdbtQz]Sq7">
                     <value name="IF0">
-                      <block type="actor_overlap_block" id="R8CumSiR2Q8-#bM08dXy">
-                        <value name="NAME">
-                          <block type="block_type" id="%`(A_7YUs]D,+:9o?/l$">
-                            <field name="NAME">coin</field>
+                      <block type="logic_operation" id="XN:]w6!yJP+M2J!_Ttk~">
+                        <field name="OP">AND</field>
+                        <value name="A">
+                          <block type="keys" id="oA#1!ZOgtu2c:Zw;DN(g">
+                            <field name="KEY">B</field>
+                            <field name="STATE">PRESSED</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <block type="logic_operation" id="eC{ZY4_$TKa?)4FfH#+M">
+                            <field name="OP">OR</field>
+                            <value name="A">
+                              <block type="actor_on_ground" id="UNhr-CGSc6x|6)e0lF7j"></block>
+                            </value>
+                            <value name="B">
+                              <block type="actor_center_overlap_block_class" id="=FZ4*sP_#`h|XS#S{X+X">
+                                <value name="NAME">
+                                  <block type="block_class" id="byRn~/RY*FMkt%uQGU_b">
+                                    <field name="NAME">water</field>
+                                  </block>
+                                </value>
+                              </block>
+                            </value>
                           </block>
                         </value>
                       </block>
                     </value>
                     <statement name="DO0">
-                      <block type="block_change_type" id="pI2zAEN5R=BT76*Jl72v">
-                        <value name="NAME">
-                          <block type="block_type" id="p{~`@,px68J%Fd0|*}*8">
-                            <field name="NAME">empty</field>
+                      <block type="set_nomath" id="k^LmIJ$#W#]JKb54a`5h">
+                        <value name="LEFT">
+                          <block type="property" id="%V4O-V[M=OXMG@cqoe)8">
+                            <field name="NAME">YVEL</field>
                           </block>
                         </value>
-                        <next>
-                          <block type="math_change" id="Q2L-:=,+~W=p[*Qe9fl$">
-                            <field name="VAR" id="twlKznGMd|v3Ti|mP_+8">coins</field>
-                            <value name="DELTA">
-                              <shadow type="math_number" id="|6~Rn=LCF7^BdM}s3RlG">
-                                <field name="NUM">1</field>
-                              </shadow>
-                            </value>
+                        <value name="RIGHT">
+                          <block type="math_number" id="(flzbNdfqIHPUh+pq+J3">
+                            <field name="NUM">-80</field>
                           </block>
-                        </next>
+                        </value>
                       </block>
                     </statement>
                     <next>
-                      <block type="controls_if" id="IR!;l6@Cfkuz+(DYD]uD">
+                      <block type="controls_if" id="XV{+|U(q.*$nrVk4H)*U">
                         <value name="IF0">
-                          <block type="actor_overlap_block" id="}]_xjHZG*:Wc{yfjJ1.0">
+                          <block type="actor_overlap_block" id="R8CumSiR2Q8-#bM08dXy">
                             <value name="NAME">
-                              <block type="block_type" id="EzL`zdgRM[ZzMAsQC+v0">
-                                <field name="NAME">red_key</field>
+                              <block type="block_type" id="%`(A_7YUs]D,+:9o?/l$">
+                                <field name="NAME">coin</field>
                               </block>
                             </value>
                           </block>
                         </value>
                         <statement name="DO0">
-                          <block type="block_change_type" id=")vqE.rn7]/GiV7[n4p[p">
+                          <block type="block_change_type" id="pI2zAEN5R=BT76*Jl72v">
                             <value name="NAME">
-                              <block type="block_type" id="M||O{S{ei=qXBhgcoq@Z">
+                              <block type="block_type" id="p{~`@,px68J%Fd0|*}*8">
                                 <field name="NAME">empty</field>
                               </block>
                             </value>
                             <next>
-                              <block type="math_change" id="9#3idb[UjqVb`(_$A-.H">
-                                <field name="VAR" id="2wj4#dvfoy!?mzd!{i1t">has_key</field>
+                              <block type="math_change" id="Q2L-:=,+~W=p[*Qe9fl$">
+                                <field name="VAR" id="twlKznGMd|v3Ti|mP_+8">coins</field>
                                 <value name="DELTA">
-                                  <shadow type="math_number" id="cZG}zUJ/I{DifGo_{ZBv">
+                                  <shadow type="math_number" id="|6~Rn=LCF7^BdM}s3RlG">
                                     <field name="NUM">1</field>
                                   </shadow>
                                 </value>
@@ -373,49 +363,29 @@
                           </block>
                         </statement>
                         <next>
-                          <block type="controls_if" id="nh(?}@6hN}^0/:xX4]Xg">
+                          <block type="controls_if" id="IR!;l6@Cfkuz+(DYD]uD">
                             <value name="IF0">
-                              <block type="logic_operation" id="lEsx(6%+%_W-a0P-L;:=">
-                                <field name="OP">AND</field>
-                                <value name="A">
-                                  <block type="logic_compare" id="a;qW;A/jdQJ2EZXFBO1:">
-                                    <field name="OP">NEQ</field>
-                                    <value name="A">
-                                      <block type="variables_get" id="#kr9Gc0:w53v{Qrk]^rJ">
-                                        <field name="VAR" id="2wj4#dvfoy!?mzd!{i1t">has_key</field>
-                                      </block>
-                                    </value>
-                                    <value name="B">
-                                      <block type="math_number" id="+|FA2ZBi|`OF6w$b%L=C">
-                                        <field name="NUM">0</field>
-                                      </block>
-                                    </value>
-                                  </block>
-                                </value>
-                                <value name="B">
-                                  <block type="actor_ran_into_block" id="_+Y@v!Ea?f(Bvw?IS[6Y">
-                                    <value name="NAME">
-                                      <block type="block_type" id="c5Xfy{.Lvt!Boy7^yAZs">
-                                        <field name="NAME">red_lock</field>
-                                      </block>
-                                    </value>
+                              <block type="actor_overlap_block" id="}]_xjHZG*:Wc{yfjJ1.0">
+                                <value name="NAME">
+                                  <block type="block_type" id="EzL`zdgRM[ZzMAsQC+v0">
+                                    <field name="NAME">red_key</field>
                                   </block>
                                 </value>
                               </block>
                             </value>
                             <statement name="DO0">
-                              <block type="block_change_type" id="|={6J4*5ID+$+zub?Nst">
+                              <block type="block_change_type" id=")vqE.rn7]/GiV7[n4p[p">
                                 <value name="NAME">
-                                  <block type="block_type" id="cOtPLfzz!8y)D5!*tm)D">
+                                  <block type="block_type" id="M||O{S{ei=qXBhgcoq@Z">
                                     <field name="NAME">empty</field>
                                   </block>
                                 </value>
                                 <next>
-                                  <block type="math_change" id="gb.(]_RILB7DQ}_!+G;?">
+                                  <block type="math_change" id="9#3idb[UjqVb`(_$A-.H">
                                     <field name="VAR" id="2wj4#dvfoy!?mzd!{i1t">has_key</field>
                                     <value name="DELTA">
-                                      <shadow type="math_number" id="nN`:np:=fC8+ysmu=0lk">
-                                        <field name="NUM">-1</field>
+                                      <shadow type="math_number" id="cZG}zUJ/I{DifGo_{ZBv">
+                                        <field name="NUM">1</field>
                                       </shadow>
                                     </value>
                                   </block>
@@ -423,11 +393,63 @@
                               </block>
                             </statement>
                             <next>
-                              <block type="note" id="^%hc__9[k7v9:gXj?SXQ">
-                                <field name="NAME">Gradually scroll to follow the player</field>
+                              <block type="controls_if" id="nh(?}@6hN}^0/:xX4]Xg">
+                                <value name="IF0">
+                                  <block type="logic_operation" id="lEsx(6%+%_W-a0P-L;:=">
+                                    <field name="OP">AND</field>
+                                    <value name="A">
+                                      <block type="logic_compare" id="a;qW;A/jdQJ2EZXFBO1:">
+                                        <field name="OP">NEQ</field>
+                                        <value name="A">
+                                          <block type="variables_get" id="#kr9Gc0:w53v{Qrk]^rJ">
+                                            <field name="VAR" id="2wj4#dvfoy!?mzd!{i1t">has_key</field>
+                                          </block>
+                                        </value>
+                                        <value name="B">
+                                          <block type="math_number" id="+|FA2ZBi|`OF6w$b%L=C">
+                                            <field name="NUM">0</field>
+                                          </block>
+                                        </value>
+                                      </block>
+                                    </value>
+                                    <value name="B">
+                                      <block type="actor_ran_into_block" id="_+Y@v!Ea?f(Bvw?IS[6Y">
+                                        <value name="NAME">
+                                          <block type="block_type" id="c5Xfy{.Lvt!Boy7^yAZs">
+                                            <field name="NAME">red_lock</field>
+                                          </block>
+                                        </value>
+                                      </block>
+                                    </value>
+                                  </block>
+                                </value>
+                                <statement name="DO0">
+                                  <block type="block_change_type" id="|={6J4*5ID+$+zub?Nst">
+                                    <value name="NAME">
+                                      <block type="block_type" id="cOtPLfzz!8y)D5!*tm)D">
+                                        <field name="NAME">empty</field>
+                                      </block>
+                                    </value>
+                                    <next>
+                                      <block type="math_change" id="gb.(]_RILB7DQ}_!+G;?">
+                                        <field name="VAR" id="2wj4#dvfoy!?mzd!{i1t">has_key</field>
+                                        <value name="DELTA">
+                                          <shadow type="math_number" id="nN`:np:=fC8+ysmu=0lk">
+                                            <field name="NUM">-1</field>
+                                          </shadow>
+                                        </value>
+                                      </block>
+                                    </next>
+                                  </block>
+                                </statement>
                                 <next>
-                                  <block type="scroll_follow_actor" id="mAg.]Ro-F-g.!@8.JCN2">
-                                    <field name="SLOW">DIV4</field>
+                                  <block type="note" id="^%hc__9[k7v9:gXj?SXQ">
+                                    <field name="NAME">Gradually scroll to follow the player</field>
+                                    <next>
+                                      <block type="scroll_follow_actor" id="mAg.]Ro-F-g.!@8.JCN2">
+                                        <field name="SLOW">DIV4</field>
+                                      </block>
+                                    </next>
                                   </block>
                                 </next>
                               </block>

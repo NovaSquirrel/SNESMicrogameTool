@@ -869,6 +869,77 @@ YesB:
   rtl
 .endproc
 
+
+.export ActorHitCeilingBlock
+.proc ActorHitCeilingBlock
+  sta 0
+  lda BlockHitFromAboveOrBelow
+  cmp #1
+  bne No
+Floor:
+  wdm 0
+  lda 0
+  cmp HitVerticallyBlockAType
+  beq YesA
+  cmp HitVerticallyBlockBType
+  beq YesB
+No:
+  clc
+  rtl
+
+YesA:
+  lda HitVerticallyBlockAPosition
+  sta LevelBlockPtr
+  sec
+  rtl
+YesB:
+  lda HitVerticallyBlockBPosition
+  sta LevelBlockPtr
+  sec
+  rtl
+.endproc
+
+.export ActorHitFloorBlock
+.proc ActorHitFloorBlock
+  sta 0
+  lda BlockHitFromAboveOrBelow
+  cmp #2
+  beq ActorHitCeilingBlock::Floor
+  clc
+  rtl
+.endproc
+
+.export ActorHitCeilingBlockClass
+.proc ActorHitCeilingBlockClass
+  sta 0
+  lda BlockHitFromAboveOrBelow
+  cmp #1
+  bne No
+Floor: ; Reuse floor code
+  lda HitVerticallyBlockAType
+  jsr CompareAgainstBlockClass
+  beq ActorHitCeilingBlock::YesA
+  lda HitVerticallyBlockBType
+  jsr CompareAgainstBlockClass
+  beq ActorHitCeilingBlock::YesB
+No:
+  clc
+  rtl
+.endproc
+
+.export ActorHitFloorBlockClass
+.proc ActorHitFloorBlockClass
+  sta 0
+  lda BlockHitFromAboveOrBelow
+  cmp #2
+  beq ActorHitCeilingBlockClass::Floor
+  clc
+  rtl
+.endproc
+
+
+
+
 .proc CompareAgainstBlockClass
   tay
   lda [GameDataPointer_BlockFlags],y ; 16-bit read on 8-bit data
@@ -954,10 +1025,15 @@ Yes:
   seta8
   stz ActorOnGround,x
   seta16
+  stz BlockHitFromAboveOrBelow
+  stz HitVerticallyBlockAType
+  stz HitVerticallyBlockAType
 
   ; If going upwards, bounce against ceilings
   lda ActorVY,x
   bpl NotUp
+    stz 0
+
     ; Left
     lda ActorPY,x
     sub #$0080
@@ -966,7 +1042,13 @@ Yes:
     sub #$0070
     jsl ActorTryVertInteraction
     asl
-    bcs BumpAgainstCeiling
+    bcc :+
+      lda [LevelBlockPtr]
+      sta HitVerticallyBlockAType
+      lda LevelBlockPtr
+      sta HitVerticallyBlockAPosition
+    :
+    rol 0
 
     ; Right
     lda ActorPY,x
@@ -976,12 +1058,23 @@ Yes:
     add #$0070
     jsl ActorTryVertInteraction
     asl
-    bcs BumpAgainstCeiling
+    bcc :+
+      lda [LevelBlockPtr]
+      sta HitVerticallyBlockBType
+      lda LevelBlockPtr
+      sta HitVerticallyBlockBPosition
+    :
+    rol 0
+
+    lda 0
+    bne BumpAgainstCeiling
 
     ; Not touching ceiling
     clc
     rtl
   BumpAgainstCeiling:
+    lda #1 ; Below
+    sta BlockHitFromAboveOrBelow
     lda #$20
     sta ActorVY,x
     clc
@@ -999,6 +1092,12 @@ Yes:
   sub #$0070
   jsl ActorTryVertInteraction
   cmp #$4000
+  bcc :+
+    lda [LevelBlockPtr]
+    sta HitVerticallyBlockAType
+    lda LevelBlockPtr
+    sta HitVerticallyBlockAPosition
+  :
   rol 0
 
   ; Right
@@ -1007,6 +1106,12 @@ Yes:
   add #$0070
   jsl ActorTryVertInteraction
   cmp #$4000
+  bcc :+
+    lda [LevelBlockPtr]
+    sta HitVerticallyBlockBType
+    lda LevelBlockPtr
+    sta HitVerticallyBlockBPosition
+  :
   rol 0
 
   lda 0
@@ -1014,6 +1119,8 @@ Yes:
   sta ActorOnGround,x
   ; React to touching the ground
   beq :+
+    lda #2 ; Above
+    sta BlockHitFromAboveOrBelow
     lda #$80
     sta ActorPY,x ; Clear the low byte
 

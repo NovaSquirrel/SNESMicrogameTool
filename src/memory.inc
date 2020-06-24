@@ -86,3 +86,9 @@ BLOCK_UPDATE_COUNT = 8
 .global RanIntoBlockAPosition
 .global RanIntoBlockBType
 .global RanIntoBlockBPosition
+
+.global HitVerticallyBlockAType
+.global HitVerticallyBlockAPosition
+.global HitVerticallyBlockBType
+.global HitVerticallyBlockBPosition
+.global BlockHitFromAboveOrBelow ; 1 if below (ceiling), 2 if above (floor)

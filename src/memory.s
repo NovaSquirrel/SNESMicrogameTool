@@ -111,6 +111,11 @@
   RanIntoBlockAPosition: .res 2
   RanIntoBlockBType:     .res 2
   RanIntoBlockBPosition: .res 2
+  HitVerticallyBlockAType:     .res 2
+  HitVerticallyBlockAPosition: .res 2
+  HitVerticallyBlockBType:     .res 2
+  HitVerticallyBlockBPosition: .res 2
+  BlockHitFromAboveOrBelow:    .res 2 ; 1 if below (ceiling), 2 if above (floor)
 
 .segment "BSS7E"
 

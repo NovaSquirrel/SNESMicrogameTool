@@ -100,6 +100,9 @@ Blockly.Xml.domToWorkspace(xml, workspace);
 		<block type="logic_operation">
 		  <field name="OP">AND</field>
 		</block>
+		<block type="vertical_logic_operation">
+		  <field name="OP">AND</field>
+		</block>
 		<block type="difficulty">
 		  <field name="EASY">TRUE</field>
 		  <field name="MEDIUM">TRUE</field>
@@ -116,13 +119,15 @@ Blockly.Xml.domToWorkspace(xml, workspace);
 		  <field name="KEY">A</field>
 		  <field name="STATE">DOWN</field>
 		</block>
-		<block type="touching_type"></block>
 		<block type="in_region"></block>
 		<block type="at_end"></block>
 		<block type="every_x_frames"></block>
 		<block type="asm_condition">
 		  <field name="FLAGS">eq</field>
 		</block>
+	  </category>
+	  <category name="Collisions" colour="#6da55b">
+		<block type="touching_type"></block>
 		<block type="actor_ran_into_block"></block>
 		<block type="actor_ran_into_block_class"></block>
 		<block type="actor_overlap_block"></block>
@@ -130,7 +135,12 @@ Blockly.Xml.domToWorkspace(xml, workspace);
 		<block type="actor_center_overlap_block"></block>
 		<block type="actor_center_overlap_block_class"></block>
 		<block type="actor_on_ground"></block>
+		<block type="actor_hit_ceiling"></block>
 		<block type="actor_hit_wall"></block>
+		<block type="actor_hit_floor_block"></block>
+		<block type="actor_hit_floor_block_class"></block>
+		<block type="actor_hit_ceiling_block"></block>
+		<block type="actor_hit_ceiling_block_class"></block>
 	  </category>
 	  <category name="Actions" colour="#5b6da5">
 		<block type="set_nomath"></block>

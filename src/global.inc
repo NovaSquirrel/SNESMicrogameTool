@@ -64,6 +64,10 @@
 .global ActorRanIntoBlockClass
 .global ActorCenterOverlapBlockClass
 .global ActorOverlapBlockClass
+.global ActorHitCeilingBlock
+.global ActorHitCeilingBlockClass
+.global ActorHitFloorBlock
+.global ActorHitFloorBlockClass
 
 LEVEL_HEIGHT = 128
 LEVEL_WIDTH  = 128

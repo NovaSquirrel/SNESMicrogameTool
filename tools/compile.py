@@ -73,6 +73,20 @@ conditions['touching-type'] = ('jsl ActorTouchingType', 1)
 conditions_flags['touching-type'] = 'cc'
 conditions['actor-on-ground'] = 'lda ActorOnGround,x'
 conditions_flags['actor-on-ground'] = 'eq'
+conditions['actor-hit-ceiling'] = 'lda BlockHitFromAboveOrBelow\ncmp #2'
+conditions_flags['actor-hit-ceiling'] = 'eq'
+
+conditions['actor-hit-wall'] = 'lda RanIntoBlockAType\nora RanIntoBlockBType'
+conditions_flags['actor-hit-wall'] = 'eq'
+conditions['actor-hit-floor-block'] = ('jsl ActorHitFloorBlock', 1)
+conditions_flags['actor-hit-floor-block'] = 'cc'
+conditions['actor-hit-floor-block-class'] = ('jsl ActorHitFloorBlockClass', 1)
+conditions_flags['actor-hit-floor-block-class'] = 'cc'
+conditions['actor-hit-ceiling-block'] = ('jsl ActorHitCeilingBlock', 1)
+conditions_flags['actor-hit-ceiling-block'] = 'cc'
+conditions['actor-hit-ceiling-block-class'] = ('jsl ActorHitCeilingBlockClass', 1)
+conditions_flags['actor-hit-ceiling-block-class'] = 'cc'
+
 conditions['actor-overlap-block'] = ('jsl ActorOverlapBlock', 1)
 conditions_flags['actor-overlap-block'] = 'cc'
 conditions['actor-overlap-block-class'] = ('jsl ActorOverlapBlockClass', 1)
