@@ -213,7 +213,6 @@ conditions['asm_condition'] = cnd_asm_condition
 def cnd_logic_operation(block):
 	return [block.field['OP'].lower(), translate_condition(block.value['A']), translate_condition(block.value['B'])]
 conditions['logic_operation'] = cnd_logic_operation
-conditions['vertical_logic_operation'] = cnd_logic_operation
 
 def cnd_logic_compare(block):
 	comparisons = {}

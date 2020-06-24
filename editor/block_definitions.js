@@ -1698,39 +1698,6 @@ Blockly.defineBlocksWithJsonArray([{
   "colour": 120,
   "tooltip": "",
   "helpUrl": ""
-},
-{
-  "type": "vertical_logic_operation",
-  "message0": "%1 %2 %3",
-  "args0": [
-    {
-      "type": "field_dropdown",
-      "name": "OP",
-      "options": [
-        [
-          "and",
-          "AND"
-        ],
-        [
-          "or",
-          "OR"
-        ]
-      ]
-    },
-    {
-      "type": "input_value",
-      "name": "A",
-      "check": "Boolean"
-    },
-    {
-      "type": "input_value",
-      "name": "B",
-      "check": "Boolean"
-    }
-  ],
-  "output": "Boolean",
-  "colour": 210,
-  "tooltip": "",
-  "helpUrl": ""
 }
+
 ]);
