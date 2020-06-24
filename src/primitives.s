@@ -48,12 +48,26 @@ ActorApplyYVelocity = ActorApplyVelocity::YOnly
   asl
   tay
   lda ActorSpeed,x
+  cmp #$0100     ; If the speed is too big to fit in 8 bits, multiply with lower precision
+  bcs TooBig
   jsl SpeedAngle2Offset256 ; A = speed, Y = angle -> 0,1,2(X) 2,3,4(Y)
   lda 1
   asr_n 6
   sta ActorVX,x
   lda 4
   asr_n 6
+  sta ActorVY,x
+  jmp ActorApplyVelocity
+
+TooBig:
+  lsr
+  lsr
+  jsl SpeedAngle2Offset256 ; A = speed, Y = angle -> 0,1,2(X) 2,3,4(Y)
+  lda 1
+  asr_n 4
+  sta ActorVX,x
+  lda 4
+  asr_n 4
   sta ActorVY,x
   jmp ActorApplyVelocity
 .endproc
@@ -176,13 +190,29 @@ NotRight:
     add ActorSpeed,x
     sta ActorPY,x
 
+    ; Left
+    lda ActorPY,x
+    sub #$0070
+    tay
+    lda ActorPX,x
+    add #$0080
+    jsr TestSolid
+    bcs SnapDown
+
+    ; Right
     lda ActorPY,x
     add #$0080
     tay
     lda ActorPX,x
+    add #$0070
     jsr TestSolid
     bcc NotDown
 
+  SnapDown:
+    lda ActorPY,x
+    and #$ff00
+    ora #$0080
+    sta ActorPY,x
 NotDown:
 
   lda 0
@@ -192,12 +222,29 @@ NotDown:
     sub ActorSpeed,x
     sta ActorPY,x
 
+    ; Left
     lda ActorPY,x
-    sub #$0080
+    sub #$0070
     tay
     lda ActorPX,x
+    sub #$0080
+    jsr TestSolid
+    bcs SnapUp
+
+    ; Right
+    lda ActorPY,x
+    add #$0080
+    tay
+    lda ActorPX,x
+    sub #$0070
     jsr TestSolid
     bcc NotUp
+
+  SnapUp:
+    lda ActorPY,x
+    and #$ff00
+    ora #$0080
+    sta ActorPY,x
 
 NotUp:
   rtl
@@ -548,10 +595,53 @@ No:
   rtl
 .endproc
 
-; todo
 .proc ActorTouchingType
+SearchFor = 0
+  sta SearchFor
+
+  ldy #ActorStart
+Search:
+  lda SearchFor
+  cmp ActorType,y
+  beq Test
+Skip:
+  tya
+  add #ActorSize
+  tay
+  cmp #ActorEnd
+  bne Search
+Fail:
+  ldy #INVALID_ACTOR
+  sty OtherActor
   clc
-  rts
+  rtl
+; -------------------------------------
+Test:
+  ; Assert that (abs(a.x - b.x) * 2 < (a.width + b.width))
+  lda ActorPX,x
+  sub ActorPX,y
+  bpl :+       ; Take the absolute value
+    eor #$ffff
+    ina
+  :
+  asl
+  cmp #(16+16)*16
+  bcs Skip
+
+  ; Assert that (abs(a.y - b.y) * 2 < (a.height + b.height))
+  lda ActorPY,x
+  sub ActorPY,y
+  bpl :+       ; Take the absolute value
+    eor #$ffff
+    ina
+  :
+  asl
+  cmp #(16+16)*16
+  bcs Skip
+Success:
+  sty OtherActor
+  sec
+  rtl
 .endproc
 
 .export ActorLookAtActor

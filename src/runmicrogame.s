@@ -30,6 +30,15 @@
 .proc StartMicrogame
   setaxy8
   .import example_GameData
+  lda #1
+  sta seed+0
+  ina
+  sta seed+1
+  ina
+  sta seed+2
+  ina
+  sta seed+3
+
   lda #<example_GameData
   sta GameDataPointer+0
   lda #>example_GameData

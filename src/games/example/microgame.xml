@@ -3,6 +3,182 @@
     <variable id="twlKznGMd|v3Ti|mP_+8">coins</variable>
     <variable id="2wj4#dvfoy!?mzd!{i1t">has_key</variable>
   </variables>
+  <block type="actor" id="u*O[LN^?1Wg!;5M9{?2G" x="1147" y="-90">
+    <field name="NAME">bread</field>
+    <statement name="INIT">
+      <block type="animation" id="tsAUnN{KDESn^.=^J8P2">
+        <field name="NAME">bread</field>
+        <field name="XFLIP">FALSE</field>
+        <field name="YFLIP">FALSE</field>
+      </block>
+    </statement>
+    <statement name="RUN">
+      <block type="controls_if" id="Oj*3q/[jJ(Ev[-6P$[%*">
+        <mutation else="1"></mutation>
+        <value name="IF0">
+          <block type="logic_compare" id="UZEpl58%At_9*kIF-;sd">
+            <field name="OP">NEQ</field>
+            <value name="A">
+              <block type="property" id="zW3)p;n(ipZv3|w+}ycv">
+                <field name="NAME">VAR1</field>
+              </block>
+            </value>
+            <value name="B">
+              <block type="math_number" id="=f{n8wx#*#Q4[K@nvCrB">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="find_type" id="1*fZ~oT`Ts=R9Ttvb1+k">
+            <value name="NAME">
+              <block type="actor_type" id="wje]jObvjw*a5-YXOfLt">
+                <field name="NAME">player</field>
+              </block>
+            </value>
+            <next>
+              <block type="set_nomath" id="y*-oPV_k:_|XyVJ^cA_8">
+                <value name="LEFT">
+                  <block type="property" id="HEa?u;#FeSl/RVKlsN_F">
+                    <field name="NAME">XPOS</field>
+                  </block>
+                </value>
+                <value name="RIGHT">
+                  <block type="other_property" id="Vrx6@gzZu,{];C9w%vzR">
+                    <field name="NAME">XPOS</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="set_nomath" id="gJ,7qB4p,leSrTtZ]P/)">
+                    <value name="LEFT">
+                      <block type="property" id="Se8m*sddD#!,kfc22eBp">
+                        <field name="NAME">YPOS</field>
+                      </block>
+                    </value>
+                    <value name="RIGHT">
+                      <block type="other_property" id="=!n$2=J1eB|}[R(qi~o7">
+                        <field name="NAME">YPOS</field>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="set_nomath" id="f$avWx{neCw.:wLTppe:">
+                        <value name="LEFT">
+                          <block type="property" id="CF#Va8N7w9sn/2xWoP=h">
+                            <field name="NAME">SPEED</field>
+                          </block>
+                        </value>
+                        <value name="RIGHT">
+                          <block type="coordinate_pixels" id="sVU1-)n*u!Az]9a|(TnH">
+                            <field name="NUM">30</field>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="ball_movement" id="l_QbID)*v3J]_=e11!i_">
+                            <next>
+                              <block type="set_math" id="Vec%B4QLki?y-:w`xNoz">
+                                <field name="OPERATION">ADD</field>
+                                <value name="VARIABLE">
+                                  <block type="property" id="pJ.s48X^~@tcP]OiGl-g">
+                                    <field name="NAME">DIRECTION</field>
+                                  </block>
+                                </value>
+                                <value name="LEFT">
+                                  <block type="property" id="V;L7has?jz}PpkM@[p(M">
+                                    <field name="NAME">DIRECTION</field>
+                                  </block>
+                                </value>
+                                <value name="RIGHT">
+                                  <block type="math_number" id="[XjgOQOQ2aWL$NA3;cCN">
+                                    <field name="NUM">1</field>
+                                  </block>
+                                </value>
+                                <next>
+                                  <block type="controls_if" id="pk5D17OIsgH6XBVG5v*.">
+                                    <value name="IF0">
+                                      <block type="keys" id="v2*{sqlG.VZwU%)d`Al]">
+                                        <field name="KEY">Y</field>
+                                        <field name="STATE">PRESSED</field>
+                                      </block>
+                                    </value>
+                                    <statement name="DO0">
+                                      <block type="set_nomath" id="kfUw1@5oBsi%)LYS@i:G">
+                                        <value name="LEFT">
+                                          <block type="property" id="Hmb*H4Ax1^~oEu(T1c(M">
+                                            <field name="NAME">VAR1</field>
+                                          </block>
+                                        </value>
+                                        <value name="RIGHT">
+                                          <block type="math_number" id="K{}_y~wVehHpmHH]4`pq">
+                                            <field name="NUM">0</field>
+                                          </block>
+                                        </value>
+                                      </block>
+                                    </statement>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </statement>
+        <statement name="ELSE">
+          <block type="controls_if" id="RMh$$[HXt_/F4{xebkX!">
+            <value name="IF0">
+              <block type="touching_type" id="]iR;daFj55Ego_eapaau">
+                <value name="NAME">
+                  <block type="actor_type" id="(!h!nBRYG!28zKr+;wW_">
+                    <field name="NAME">player</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <statement name="DO0">
+              <block type="set_math" id=";@IHZ/f3IbBw`lhhVFbq">
+                <field name="OPERATION">RANDOM</field>
+                <value name="VARIABLE">
+                  <block type="property" id="U:bmZsS|:ux}{Ja{@W0I">
+                    <field name="NAME">DIRECTION</field>
+                  </block>
+                </value>
+                <value name="LEFT">
+                  <block type="math_number" id="0P_Nu~_3LvzC36#B8h:a">
+                    <field name="NUM">0</field>
+                  </block>
+                </value>
+                <value name="RIGHT">
+                  <block type="math_number" id="doH/~@~uAO~H3(EyKF)*">
+                    <field name="NUM">255</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="set_nomath" id="^6XFnZl1RE9ecep.np+v">
+                    <value name="LEFT">
+                      <block type="property" id="aQtPqpdxg(ZH6|qnzE.l">
+                        <field name="NAME">VAR1</field>
+                      </block>
+                    </value>
+                    <value name="RIGHT">
+                      <block type="math_number" id="#+aKzYlYBYPtfPGx*=:)">
+                        <field name="NUM">1</field>
+                      </block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </statement>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
   <block type="actor" id="0bjP)UuMl,K/|$l7s^u#" x="59" y="62">
     <field name="NAME">ball</field>
     <statement name="INIT">
@@ -269,16 +445,6 @@
       </block>
     </statement>
   </block>
-  <block type="actor" id="u*O[LN^?1Wg!;5M9{?2G" x="1138" y="271">
-    <field name="NAME">bread</field>
-    <statement name="INIT">
-      <block type="animation" id="tsAUnN{KDESn^.=^J8P2">
-        <field name="NAME">bread</field>
-        <field name="XFLIP">FALSE</field>
-        <field name="YFLIP">FALSE</field>
-      </block>
-    </statement>
-  </block>
   <block type="actor" id="+hj%Tuw^=2bh/Y,-|}=E" x="60" y="344">
     <field name="NAME">youmarker</field>
     <statement name="INIT">
@@ -334,21 +500,15 @@
                   </block>
                 </value>
                 <next>
-                  <block type="set_math" id="o_CoyKojiu#q=(rL67JR">
-                    <field name="OPERATION">ADD</field>
-                    <value name="VARIABLE">
-                      <block type="property" id="gzxBmYgQj*`.$q-Yye:k">
-                        <field name="NAME">XPOS</field>
-                      </block>
-                    </value>
+                  <block type="set_nomath" id="Me9O]bBGD^KRa6-4n-Vf">
                     <value name="LEFT">
-                      <block type="other_property" id="~,lNooq7oSJ/cqSwVxfo">
+                      <block type="property" id="Oo;Jw#OmMfR-D9~$7k[o">
                         <field name="NAME">XPOS</field>
                       </block>
                     </value>
                     <value name="RIGHT">
-                      <block type="coordinate_pixels" id="7WqR@e|Y:9K1T34{Y^Q0">
-                        <field name="NUM">0</field>
+                      <block type="other_property" id="9TmZVCNCA0hhU`/oD8[~">
+                        <field name="NAME">XPOS</field>
                       </block>
                     </value>
                     <next>
