@@ -225,14 +225,12 @@ RecordCollidedWith:
   rts
 StoreA:
   lda [LevelBlockPtr]
-  and #255
   sta RanIntoBlockAType
   lda LevelBlockPtr
   sta RanIntoBlockAPosition
   rts
 StoreB:
   lda [LevelBlockPtr]
-  and #255
   sta RanIntoBlockBType
   lda LevelBlockPtr
   sta RanIntoBlockAPosition
@@ -939,6 +937,8 @@ Yes:
   rtl
 .endproc
 
+.a16
+.i16
 .export ActorTryVertInteraction
 .import BlockRunInteractionActorTopBottom
 .proc ActorTryVertInteraction
@@ -949,6 +949,8 @@ Yes:
   rtl
 .endproc
 
+.a16
+.i16
 .export ActorGravity
 .proc ActorGravity
   add ActorVY,x
@@ -964,15 +966,15 @@ OK:
   jml ActorApplyYVelocity
 .endproc
 
+.a16
+.i16
 .export BlockChangeType
 .proc BlockChangeType
 Temp = 0
   phx
   phy
   php
-  seta8
   sta [LevelBlockPtr] ; Make the change in the level buffer itself
-  setaxy16
 
   ; Find a free index in the block update queue
   ldx #(BLOCK_UPDATE_COUNT-1)*2
@@ -987,18 +989,14 @@ Found:
   ; From this point on in the routine, X = free update queue index
 
   ; Save block number in Y for [zeropage],y
-  and #255
   asl
   tay
   ; Now the accumulator is free to do other things
 
   ; -----------------------------------
-
   ; First, make sure the block is actually onscreen (Horizontally)
-  lda LevelBlockPtr ; Get level column
-  asl
-  xba
   seta8
+  lda LevelBlockPtr+1 ; Get level column
   sta Temp ; Store column so it can be compared against
 
   lda ScrollX+1
@@ -1022,6 +1020,7 @@ Found:
 
   ; Second, make sure the block is actually onscreen (Vertically)
   lda LevelBlockPtr ; Get level row
+  lsr
   and #127
   seta8
   sta Temp ; Store row so it can be compared against
@@ -1056,11 +1055,10 @@ Found:
   sta BlockUpdateDataBR,x
 
   ; Now calculate the PPU address
-  ; LevelBlockPtr is 00xxxxxxxyyyyyyy
+  ; LevelBlockPtr is 0xxxxxxxyyyyyyy0
   ; Needs to become  0...pyyyyyxxxxx0
   lda LevelBlockPtr
-  and #%1111 ; Grab Y & 15
-  asl
+  and #%11110 ; Grab Y & 15
   asl
   asl
   asl
@@ -1071,7 +1069,6 @@ Found:
 
   ; Add in X
   lda LevelBlockPtr
-  asl
   xba
   and #15
   asl
@@ -1080,7 +1077,7 @@ Found:
 
   ; Choose second screen if needed
   lda LevelBlockPtr
-  and #%0000100000000000
+  and #%0001000000000000
   beq :+
     lda BlockUpdateAddress,x
     ora #2048>>1
@@ -1248,20 +1245,19 @@ Shift:
 ; input: A (X position in 12.4 format), Y (Y position in 12.4 format)
 .export GetLevelPtrXY
 .proc GetLevelPtrXY
-  ; X position * 128
-  lsr
-  and #%0011111110000000
+  ; X position
+  and #%0111111100000000
   sta LevelBlockPtr
-  ; 00xxxxxxx0000000
+  ; 0xxxxxxx00000000
 
   ; Y position
   tya
   xba
   and #127
+  asl
   tsb LevelBlockPtr
-  ; 00xxxxxxxyyyyyyy
+  ; 0xxxxxxxyyyyyyy0
 
   lda [LevelBlockPtr]
-  and #255
   rtl
 .endproc

@@ -32,7 +32,6 @@
 .a16
   and #255
   xba ; * 256
-  lsr ; * 128
   sta LevelBlockPtr
   rtl
 .endproc
@@ -43,7 +42,7 @@
 .proc RenderLevelScreens
   setaxy16
   lda #256*15
-  sta ScrollX
+  stz ScrollX
 
   lda #256
   sta ScrollY
@@ -65,6 +64,7 @@ YPos = 4
   lda ScrollY
   xba
   and #LEVEL_HEIGHT-1
+  asl
   sta YPos
 
 Loop:
@@ -198,14 +198,13 @@ Loop:
 .proc RenderLevelColumnLeft
   tya
   asl
-  asl
   and #(32*2)-1
   tax
   stx TempVal
 : lda [LevelBlockPtr],y ; Get the next level tile
   iny
+  iny
   phy
-  and #255
   asl
   tay
   ; Write the two tiles in
@@ -239,14 +238,13 @@ Loop:
 .proc RenderLevelColumnRight
   tya
   asl
-  asl
   and #(32*2)-1
   tax
   stx TempVal
 : lda [LevelBlockPtr],y ; Get the next level tile
   iny
+  iny
   phy
-  and #255
   asl
   tay
   ; Write the two tiles in
@@ -285,7 +283,6 @@ Loop:
 
 : lda [LevelBlockPtr],y ; Get the next level tile
   phy
-  and #255
   asl
   tay
   ; Write the two tiles in
@@ -301,7 +298,7 @@ Loop:
 
   ; Next column
   lda LevelBlockPtr
-  add #128 ;LevelColumnSize
+  add #256 ;LevelColumnSize
   and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1 ; Mask for entire level, dimensions actually irrelevant
   sta LevelBlockPtr
 
@@ -329,7 +326,6 @@ Loop:
 
 : lda [LevelBlockPtr],y ; Get the next level tile
   phy
-  and #255
   asl
   tay
   ; Write the two tiles in
@@ -345,7 +341,7 @@ Loop:
 
   ; Next column
   lda LevelBlockPtr
-  add #128 ;LevelColumnSize
+  add #256 ;LevelColumnSize
   and #(LEVEL_WIDTH*LEVEL_HEIGHT*LEVEL_TILE_SIZE)-1 ; Mask for entire level, dimensions actually irrelevant
   sta LevelBlockPtr
 

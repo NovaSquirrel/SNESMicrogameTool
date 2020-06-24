@@ -115,4 +115,4 @@
 .segment "BSS7E"
 
 .segment "BSS7F"
-LevelMap: .res 16384 ; 128*128
+LevelMap: .res 32768 ; 128*128

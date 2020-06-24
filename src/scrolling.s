@@ -119,7 +119,7 @@ YPos = 6
   ; Take the Y position, rounded to blocks,
   ; as the column of level data to read
   lda Temp
-  lsr
+  and #<~1
   tay
 
   ; Generate the top or the bottom as needed
@@ -161,6 +161,7 @@ YPos = 6
   lda ScrollY
   xba
   and #LEVEL_HEIGHT-1
+  asl
   tay
 
   ; Generate the top or bottom as needed

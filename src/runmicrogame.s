@@ -210,6 +210,8 @@ Loop:
   iny
   sta LevelMap,x
   inx
+  stz LevelMap,x
+  inx
   dec RowsLeft
   bne Loop
   ; Next column
@@ -217,8 +219,8 @@ Loop:
   sta RowsLeft
   seta16
   txa
-  and #.loword(~127) ; Reset to the first row
-  add #128           ; Move down a column
+  and #.loword(~255) ; Reset to the first row
+  add #256           ; Move down a column
   tax
   seta8
   dec ColumnsLeft
