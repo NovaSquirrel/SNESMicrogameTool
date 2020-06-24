@@ -697,7 +697,7 @@ def compile_microgame(game, output, name, maps, animations):
 
 		# Write column by column instead
 		for x in range(map.map_width):
-			outfile.write('.byt %s\n' % (','.join([str(all_blocks.index(map.map_data[y][x])) for y in range(map.map_height)])))
+			outfile.write('.word %s\n' % (','.join([str(all_blocks.index(map.map_data[y][x])) for y in range(map.map_height)])))
 
 		outfile.write('Actors:\n')
 		for a in map.actor_list:

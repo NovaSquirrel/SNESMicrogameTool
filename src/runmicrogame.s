@@ -207,10 +207,12 @@ RowsLeft = 7
   iny
 Loop:
   lda [Pointer],y
-  iny
   sta LevelMap,x
+  iny
   inx
-  stz LevelMap,x
+  lda [Pointer],y
+  sta LevelMap,x
+  iny
   inx
   dec RowsLeft
   bne Loop
