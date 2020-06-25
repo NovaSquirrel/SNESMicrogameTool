@@ -877,7 +877,6 @@ YesB:
   cmp #1
   bne No
 Floor:
-  wdm 0
   lda 0
   cmp HitVerticallyBlockAType
   beq YesA

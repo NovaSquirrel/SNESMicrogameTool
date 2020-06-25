@@ -464,6 +464,8 @@ padwait:
   jsl ppu_clear_oam
   jsl ppu_pack_oamhi
 
+  inc MicrogameFrames
+
   jmp Forever
 .endproc
 
