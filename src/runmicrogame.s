@@ -507,6 +507,10 @@ Loop:
   beq Skip
 
   lda ActorArt,x
+  and #OAM_XFLIP|OAM_YFLIP
+  sta 0 ; Save flips
+  lda ActorArt,x
+  and #.loword(~(OAM_XFLIP|OAM_YFLIP))
   asl ; * 2
   asl ; * 4
   tay
@@ -516,6 +520,7 @@ Loop:
     iny
     iny
     lda [GameDataPointer_Animations],y
+    ora 0
     jsr DispActor16x16
   Not16:
 

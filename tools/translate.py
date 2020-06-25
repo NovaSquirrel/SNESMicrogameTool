@@ -289,9 +289,9 @@ all_animations = set()
 def blk_animation(block):
 	flips = 0
 	if block.field['XFLIP'] == 'TRUE':
-		flips |= 64
+		flips |= 0x4000
 	if block.field['YFLIP'] == 'TRUE':
-		flips |= 128
+		flips |= 0x8000
 	all_animations.add(block.field['NAME'])
 	return ['animation', '%s|%d' % (block.field['NAME'], flips)]	
 blocks['animation'] = blk_animation
