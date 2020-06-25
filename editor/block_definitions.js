@@ -40,7 +40,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Change the actor's current animation",
+  "tooltip": "Change the actor's current animation and flips",
   "helpUrl": ""
 },
 {
@@ -114,7 +114,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "Do the action every so often",
+  "tooltip": "Returns true every so often",
   "helpUrl": ""
 },
 {
@@ -237,7 +237,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Moves forward at an angle",
+  "tooltip": "Moves forward at an angle; stop when hitting solid blocks",
   "helpUrl": ""
 },
 {
@@ -246,7 +246,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Moves forward at an angle",
+  "tooltip": "Moves forward at an angle; reflect off of solid blocks",
   "helpUrl": ""
 },
 {
@@ -255,7 +255,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Moves forward at an angle",
+  "tooltip": "Moves forward at an angle; bounce against solid blocks",
   "helpUrl": ""
 },
 {
@@ -273,7 +273,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Add velocity to the position",
+  "tooltip": "Add velocity to the position; stop when hitting solid blocks",
   "helpUrl": ""
 },
 {
@@ -282,7 +282,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Add velocity to the position",
+  "tooltip": "Add velocity to the position; reflect off of solid blocks",
   "helpUrl": ""
 },
 {
@@ -334,7 +334,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Move in response to the player's presses",
+  "tooltip": "Move in the directions the player holds",
   "helpUrl": ""
 },
 {
@@ -402,7 +402,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": "Number",
   "colour": 230,
-  "tooltip": "Property for this object",
+  "tooltip": "Property for this actor",
   "helpUrl": ""
 },
 {
@@ -470,7 +470,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": "Number",
   "colour": 230,
-  "tooltip": "Property for other block",
+  "tooltip": "Property for other actor",
   "helpUrl": ""
 },
 {
@@ -497,7 +497,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Destroy the current object",
+  "tooltip": "Destroy the current actor",
   "helpUrl": ""
 },
 {
@@ -511,7 +511,7 @@ Blockly.defineBlocksWithJsonArray([{
 },
 {
   "type": "target_other",
-  "message0": "As other object %1 %2",
+  "message0": "As other actor %1 %2",
   "args0": [
     {
       "type": "input_dummy"
@@ -524,7 +524,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Do these actions as the other object",
+  "tooltip": "Do these actions as the other actor",
   "helpUrl": ""
 },
 {
@@ -604,7 +604,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Jump to a specific location",
+  "tooltip": "Move the actor to a specific location",
   "helpUrl": ""
 },
 {
@@ -613,7 +613,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Jump to the other object",
+  "tooltip": "Move to where the other actor is",
   "helpUrl": ""
 },
 {
@@ -622,7 +622,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Swap positions with another object",
+  "tooltip": "Swap positions with another actor",
   "helpUrl": ""
 },
 {
@@ -638,7 +638,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Destroy all objects of a given type",
+  "tooltip": "Destroy all actors of a given type",
   "helpUrl": ""
 },
 {
@@ -647,7 +647,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Clear the speed and velocity",
+  "tooltip": "Clear the actor's speed and velocity",
   "helpUrl": ""
 },
 {
@@ -656,7 +656,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Turn around",
+  "tooltip": "Invert the actor's speed and velocity",
   "helpUrl": ""
 },
 {
@@ -723,7 +723,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Add an amount of gravity",
+  "tooltip": "Add an amount of gravity - \"Collide with level\" makes it respond to floors and ceilings",
   "helpUrl": ""
 },
 {
@@ -750,7 +750,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "Create an actor somewhere",
+  "tooltip": "Create an actor at a given position",
   "helpUrl": ""
 },
 {
@@ -765,7 +765,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "Can an actor of a given type be found?",
+  "tooltip": "Can an actor of a given type be found? Also targets that actor as the \"other actor\"",
   "helpUrl": ""
 },
 {
@@ -1011,7 +1011,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "",
+  "tooltip": "Returns true based on the flags when the contained actions finish",
   "helpUrl": ""
 },
 {
@@ -1028,7 +1028,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": "Number",
   "colour": 230,
-  "tooltip": "Converts an amount of pixels to a coordinate",
+  "tooltip": "Converts an amount of pixels to a coordinate (it gets multiplied by 16)",
   "helpUrl": ""
 },
 {
@@ -1084,7 +1084,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "",
+  "tooltip": "Sets a variable to a value",
   "helpUrl": ""
 },
 {
@@ -1113,7 +1113,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "inputsInline": false,
   "colour": 120,
-  "tooltip": "Code for the game itself",
+  "tooltip": "Code that should run during game loading, or before every frame",
   "helpUrl": ""
 },
 {
@@ -1184,7 +1184,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "",
+  "tooltip": "Target a block on the map, using block-sized units",
   "helpUrl": ""
 },
 {
@@ -1208,7 +1208,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "",
+  "tooltip": "Target a block on the map, using two coordinates",
   "helpUrl": ""
 },
 {
@@ -1232,7 +1232,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "",
+  "tooltip": "Target a block on the map, using coordinates offset from an actor's position",
   "helpUrl": ""
 },
 {
@@ -1247,7 +1247,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "",
+  "tooltip": "Change the targeted block type",
   "helpUrl": ""
 },
 {
@@ -1268,7 +1268,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "",
+  "tooltip": "Target the block type some number of block-size units relative to the current target",
   "helpUrl": ""
 },
 {
@@ -1277,7 +1277,7 @@ Blockly.defineBlocksWithJsonArray([{
   "output": "Number",
   "colour": 230,
   "tooltip": "",
-  "helpUrl": ""
+  "helpUrl": "Targeted block's X position, in block-size units"
 },
 {
   "type": "block_target_y",
@@ -1285,7 +1285,7 @@ Blockly.defineBlocksWithJsonArray([{
   "output": "Number",
   "colour": 230,
   "tooltip": "",
-  "helpUrl": ""
+  "helpUrl": "Targeted block's Y position, in block-size units"
 },
 {
   "type": "block_target_type",
@@ -1293,7 +1293,7 @@ Blockly.defineBlocksWithJsonArray([{
   "output": "Number",
   "colour": 230,
   "tooltip": "",
-  "helpUrl": ""
+  "helpUrl": "Type of the targeted block"
 },
 {
   "type": "block_target_class",
@@ -1301,7 +1301,7 @@ Blockly.defineBlocksWithJsonArray([{
   "output": "Number",
   "colour": 230,
   "tooltip": "",
-  "helpUrl": ""
+  "helpUrl": "Class of the targeted block"
 },
 {
   "type": "block_target_flags",
@@ -1375,7 +1375,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "",
+  "tooltip": "Check the targeted block's flags",
   "helpUrl": ""
 },
 {
@@ -1383,7 +1383,7 @@ Blockly.defineBlocksWithJsonArray([{
   "message0": "Block target is solid",
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "",
+  "tooltip": "Returns true if the targeted block is solid",
   "helpUrl": ""
 },
 
@@ -1398,7 +1398,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "",
+  "tooltip": "Return true if actor had gravity applied (with level collision) and hit a specific type of block above",
   "helpUrl": ""
 },
 {
@@ -1412,7 +1412,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "",
+  "tooltip": "Return true if actor had gravity applied (with level collision) and hit a specific class of block above",
   "helpUrl": ""
 },
 {
@@ -1426,7 +1426,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "",
+  "tooltip": "Return true if actor had gravity applied (with level collision) and hit a specific type of block below",
   "helpUrl": ""
 },
 {
@@ -1440,7 +1440,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "",
+  "tooltip": "Return true if actor had gravity applied (with level collision) and hit a specific class of block below",
   "helpUrl": ""
 },
 {
@@ -1448,7 +1448,7 @@ Blockly.defineBlocksWithJsonArray([{
   "message0": "Actor touched the ceiling",
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "",
+  "tooltip": "Return true if actor had gravity applied (with level collision) and was stopped by a block above it",
   "helpUrl": ""
 },
 
@@ -1463,7 +1463,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "",
+  "tooltip": "Return true if actor used 8-way, ball, or vector movement and hit a solid block of a specific type",
   "helpUrl": ""
 },
 {
@@ -1477,7 +1477,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "",
+  "tooltip": "Return true if actor used 8-way, ball, or vector movement and hit a solid block of a specific class",
   "helpUrl": ""
 },
 {
@@ -1491,7 +1491,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "",
+  "tooltip": "Returns true if actor is currently overlapping a block of a specific type",
   "helpUrl": ""
 },
 {
@@ -1505,7 +1505,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "",
+  "tooltip": "Returns true if actor is currently overlapping a block of a specific class",
   "helpUrl": ""
 },
 {
@@ -1519,7 +1519,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "",
+  "tooltip": "Returns true if actor's center is currently overlapping a block of a specific type",
   "helpUrl": ""
 },
 {
@@ -1533,7 +1533,7 @@ Blockly.defineBlocksWithJsonArray([{
   ],
   "output": null,
   "colour": 210,
-  "tooltip": "",
+  "tooltip": "Returns true if actor's center is currently overlapping a block of a specific class",
   "helpUrl": ""
 },
 {
@@ -1553,7 +1553,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "",
+  "tooltip": "Immediately set the scroll to a particular value",
   "helpUrl": ""
 },
 {
@@ -1595,7 +1595,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "",
+  "tooltip": "Smoothly slide the scroll over to a particular value",
   "helpUrl": ""
 },
 {
@@ -1628,7 +1628,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "",
+  "tooltip": "Make the camera smoothly follow an actor",
   "helpUrl": ""
 },
 {
@@ -1644,7 +1644,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 0,
-  "tooltip": "",
+  "tooltip": "Defines a label that can be goto'd to (or used with assembly)",
   "helpUrl": ""
 },
 {
@@ -1660,7 +1660,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 230,
-  "tooltip": "",
+  "tooltip": "Jumps to a label",
   "helpUrl": ""
 },
 {
@@ -1668,7 +1668,7 @@ Blockly.defineBlocksWithJsonArray([{
   "message0": "Actor touching the ground",
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "",
+  "tooltip": "Return true if actor had gravity applied (with level collision) and hit the ground",
   "helpUrl": ""
 },
 {
@@ -1676,7 +1676,7 @@ Blockly.defineBlocksWithJsonArray([{
   "message0": "Actor hit a wall",
   "output": "Boolean",
   "colour": 210,
-  "tooltip": "",
+  "tooltip": "Return true if actor used 8-way, ball, or vector movement and hit a wall",
   "helpUrl": ""
 },
 {
@@ -1696,7 +1696,7 @@ Blockly.defineBlocksWithJsonArray([{
   "previousStatement": null,
   "nextStatement": null,
   "colour": 120,
-  "tooltip": "",
+  "tooltip": "Always execute the loop at least once, and check the condition at the end of each iteration",
   "helpUrl": ""
 }
 
