@@ -518,7 +518,7 @@ Blockly.defineBlocksWithJsonArray([{
     },
     {
       "type": "input_statement",
-      "name": "NAME"
+      "name": "DO"
     }
   ],
   "previousStatement": null,
@@ -968,7 +968,7 @@ Blockly.defineBlocksWithJsonArray([{
   "args0": [
     {
       "type": "input_statement",
-      "name": "NAME"
+      "name": "ASM"
     },
     {
       "type": "field_dropdown",

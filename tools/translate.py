@@ -206,8 +206,8 @@ def cnd_block_target_solid(block):
 conditions['block_target_solid'] = cnd_block_target_solid
 
 def cnd_asm_condition(block):
-	# todo
-	return []
+	flags = block.field['FLAGS']
+	return ['asm-condition', flags, translate_routine(block.statement['ASM'])]
 conditions['asm_condition'] = cnd_asm_condition
 
 def cnd_logic_operation(block):
@@ -361,8 +361,7 @@ def blk_exit(block):
 blocks['exit'] = blk_exit
 
 def blk_target_other(block):
-	#todo
-	pass
+	return ['as-other-actor', translate_routine(block.statement['DO'])]
 blocks['target_other'] = blk_target_other
 
 def blk_jump_xy(block):
@@ -390,7 +389,7 @@ def blk_find_type(block):
 blocks['find_type'] = blk_find_type
 
 def blk_look_xy(block):
-	return ['look_at_point', block.translate_value('XPOS'), block.translate_value('YPOS')]
+	return ['look_at_point', block.translate_value('POSX'), block.translate_value('POSY')]
 blocks['look_xy'] = blk_look_xy
 
 def blk_look_other(block):
@@ -439,10 +438,41 @@ def blk_scroll_follow_actor(block):
 		return ['scroll-follow-actor', 3]
 blocks['scroll_follow_actor'] = blk_scroll_follow_actor
 
+def blk_scroll_slide(block):
+	x, y = block.translate_value('X'), block.translate_value('Y')
+	if block.field['SLOW'] == 'DIV1':
+		return ['scroll-slide', 0, x, y]
+	if block.field['SLOW'] == 'DIV2':
+		return ['scroll-slide', 1, x, y]
+	if block.field['SLOW'] == 'DIV4':
+		return ['scroll-slide', 2, x, y]
+	if block.field['SLOW'] == 'DIV8':
+		return ['scroll-slide', 3, x, y]
+blocks['scroll_slide'] = blk_scroll_slide
+
+def blk_scroll_set(block):
+	return ['scroll-set', block.translate_value('X'), block.translate_value('Y')]
+blocks['scroll_set'] = blk_scroll_set
 
 def blk_note(block):
 	return []
 blocks['note'] = blk_note
+
+def blk_block_target_map_xy(block):
+	return ['block-target-map-xy', block.translate_value('X'), block.translate_value('Y')]
+blocks['block_target_map_xy'] = blk_block_target_map_xy
+
+def blk_block_target_coordinate_xy(block):
+	return ['block-target-coordinate-xy', block.translate_value('X'), block.translate_value('Y')]
+blocks['block_target_coordinate_xy'] = blk_block_target_coordinate_xy
+
+def blk_block_target_actor_xy(block):
+	return ['block-target-actor-xy', block.translate_value('X'), block.translate_value('Y')]
+blocks['block_target_actor_xy'] = blk_block_target_actor_xy
+
+def blk_retarget_xy(block):
+	return ['block-retarget-xy', int(block.field['X']), int(block.field['Y'])]
+blocks['block_retarget_xy'] = blk_retarget_xy
 
 def blk_block_change_type(block):
 	return ['block-change-type', block.translate_value('NAME')]
@@ -459,8 +489,7 @@ blocks['math_change'] = blk_math_change
 def blk_variables_set(block):
 	return ['set',
 		'variable:'+block.field['VAR'],
-		'variable:'+block.field['VAR'],
-		block.translate_value('DVALUE')]
+		block.translate_value('VALUE')]
 blocks['variables_set'] = blk_variables_set
 
 
@@ -488,12 +517,12 @@ def blk_controls_if(block):
 	for i in range(has_elif):
 		the_elif = {}
 		the_elif['if'] = translate_condition(block.value['IF'+str(i+1)])
-		the_elif['then'] = translate_routine(block.statement['DO'+str(i+1)])
+		the_elif['then'] = translate_routine(block.statement['DO'+str(i+1)] if 'DO'+str(i+1) in block.statement else None)
 		put_else_in['else'] = the_elif
 		put_else_in = the_elif
 
 	out['if'] = translate_condition(block.value['IF0'])
-	out['then'] = translate_routine(block.statement['DO0'])
+	out['then'] = translate_routine(block.statement['DO0'] if 'DO0' in block.statement else None)
 	if 'ELSE' in block.statement:
 		put_else_in['else'] = translate_routine(block.statement['ELSE'])
 	return out

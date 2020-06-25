@@ -121,10 +121,12 @@ conditions['at-end'] = 'lda MicrogameTime \ cmp #128' # todo
 conditions_flags['at_end'] = 'ne'
 
 conditions ['block-target-solid'] = ('BlockTargetSolid', 1)
+conditions_flags['block-target-solid'] = 'cc'
 
 def condition_block_target_flags(a):
-	pass
+	print("Block target flags")
 conditions['block-target-flags'] = condition_block_target_flags
+conditions_flags['block-target-flags'] = 'cc'
 
 def insert_branch(flags, label, negate):
 	opposite = {
@@ -263,6 +265,14 @@ actions['block-target-actor-xy'] = ('BlockTargetActorXY', 2)
 actions['block-change-type'] = ('BlockChangeType', 1)
 actions[''] = ''
 
+def cmd_label(a):
+	outfile.write('Label_%s:\n' % a[0])
+actions['label'] = cmd_label
+
+def cmd_goto(a):
+	outfile.write('jmp Label_%s\n' % a[0])
+actions['goto'] = cmd_goto
+
 def cmd_scroll_set(a):
 	print("scroll set")
 actions['scroll-set'] = cmd_scroll_set
@@ -283,7 +293,8 @@ def cmd_scroll_follow_actor(a):
 actions['scroll-follow-actor'] = cmd_scroll_follow_actor
 
 def cmd_block_retarget_xy(a):
-	print("block retarget")
+	offset = (a[1]+a[0]*128)*2
+	outfile.write('lda LevelBlockPtr\nadd #%d\nsta LevelBlockPtr' % offset)
 actions['block-retarget-xy'] = cmd_block_retarget_xy
 
 def cmd_animation(a):
@@ -353,7 +364,7 @@ def cmd_set(a):
 				outfile.write('lsr\n' * a[3])
 			outfile.write('sta %s\n' % compile_value(a[0]))
 	else:
-		print("Invalid set action")
+		print("Invalid set action " + str(a))
 actions['set'] = cmd_set
 
 # -----------------------------------------------------------------------------
@@ -517,7 +528,8 @@ def compile_block(block):
 				print("Unrecognized conditional/loop "+str(action))
 			outfile.write('\n') # spacing between actions
 		else:
-			print('Item in block is the wrong type')
+			print('Item in block is the wrong type ' + str(block))
+			raise Exception("Item %s in block is the wrong type: %s" % (str(action), str(block)))
 
 def compile_routine(name, block):
 	""" Makes a routine and the necessary stuff around it """
