@@ -293,6 +293,14 @@ ActorLoop:
   bra ActorLoop
 LastActor:
 
+  ; Pointer to run when initializing
+  ldy #16*2
+  lda [GameDataPointer],y
+  beq :+
+    sta 0
+    jsl CallPointer
+  :
+
   ; Set up PPU registers and stuff
   seta8
   lda #1
@@ -451,6 +459,15 @@ padwait:
   sta OldScrollX
   lda ScrollY
   sta OldScrollY
+
+  ; Pointer to run every frame
+  ldy #15*2
+  lda [GameDataPointer],y
+  beq :+
+    sta 0
+    jsl CallPointer
+  :
+
   jsr RunActors
   jsr DrawActors
   .import UpdateScrolling
@@ -499,6 +516,7 @@ Call:
   seta16
   jml [0]
 .endproc
+CallPointer = RunActors::Call
 
 .proc DrawActors
   ldx #ActorStart

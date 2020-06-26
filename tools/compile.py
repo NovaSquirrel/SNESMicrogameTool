@@ -615,6 +615,14 @@ def compile_microgame(game, output, name, maps, animations):
 	outfile.write('.word %d\n' % (32*len(sprite_chr)))
 	outfile.write('.addr %s_SpriteChrData\n' % gamename)
 	outfile.write('.addr %s_AnimationInfo\n' % gamename)
+	if 'run' in game['game']:
+		outfile.write('.addr %s_Run\n' % gamename)
+	else:
+		outfile.write('.addr 0\n')
+	if 'init' in game['game']:
+		outfile.write('.addr %s_Init\n' % gamename)
+	else:
+		outfile.write('.addr 0\n')
 	outfile.write('.endproc\n\n')
 
 	# actor type list
