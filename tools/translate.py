@@ -54,6 +54,9 @@ class Block(object):
 				self.statement[e.attrib['name']] = e[0]
 			elif tagname2 == 'value':
 				self.value[e.attrib['name']] = e[0]
+				# If there's a shadow block as well as a real block, use the real one instead
+				if strip_namespace(e[0].tag) == 'shadow' and len(e) > 1:
+					self.value[e.attrib['name']] = e[1]
 			elif tagname2 == 'next':
 				self.next = e[0]
 			elif tagname2 == 'mutation':
@@ -389,7 +392,7 @@ def blk_find_type(block):
 blocks['find_type'] = blk_find_type
 
 def blk_look_xy(block):
-	return ['look_at_point', block.translate_value('POSX'), block.translate_value('POSY')]
+	return ['look-at-point', block.translate_value('POSX'), block.translate_value('POSY')]
 blocks['look_xy'] = blk_look_xy
 
 def blk_look_other(block):
