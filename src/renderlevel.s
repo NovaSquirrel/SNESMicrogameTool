@@ -41,14 +41,6 @@
 .export RenderLevelScreens
 .proc RenderLevelScreens
   setaxy16
-  lda #256*15
-  stz ScrollX
-
-  lda #256
-  sta ScrollY
-
-  ; -------------------
-
 BlockNum = 0
 BlocksLeft = 2
 YPos = 4

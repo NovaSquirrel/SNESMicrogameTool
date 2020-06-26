@@ -144,6 +144,9 @@
   .import MemClear7F
   jsl MemClear7F
 
+  stz ScrollX
+  stz ScrollY
+
   ; Load map zero
   lda #0
   jsr LoadMicrogameMap
